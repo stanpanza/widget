@@ -2,10 +2,8 @@ package widget
 
 import (
 	"fmt"
-	"reflect"
 	"time"
 
-	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"
 	"github.com/qor/qor"
 	"github.com/qor/qor/resource"
@@ -30,31 +28,22 @@ type QorWidgetSettingInterface interface {
 
 // QorWidgetSetting default qor widget setting struct
 type QorWidgetSetting struct {
-	Name        string `gorm:"primary_key"`
-	WidgetType  string `gorm:"primary_key;size:128"`
-	Scope       string `gorm:"primary_key;size:128;default:'default'"`
-	GroupName   string
-	ActivatedAt *time.Time
-	Template    string
+	Name       string `gorm:"primary_key"`
+	WidgetType string `gorm:"primary_key;size:128"`
+	Scope      string `gorm:"primary_key;size:128;default:'default'"`
+	GroupName  string
+	Template   string
 	serializable_meta.SerializableMeta
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
+// ResourceName get widget setting's resource name
 func (widgetSetting *QorWidgetSetting) ResourceName() string {
 	return "Widget Content"
 }
 
-func (widgetSetting *QorWidgetSetting) BeforeCreate() {
-	now := time.Now()
-	widgetSetting.ActivatedAt = &now
-}
-
-func (widgetSetting *QorWidgetSetting) BeforeUpdate(scope *gorm.Scope) error {
-	value := reflect.New(scope.GetModelStruct().ModelType).Interface()
-	return scope.NewDB().Model(value).Where("name = ? AND scope = ?", widgetSetting.Name, widgetSetting.Scope).UpdateColumn("activated_at", gorm.Expr("NULL")).Error
-}
-
+// GetSerializableArgumentKind get serializable kind
 func (widgetSetting *QorWidgetSetting) GetSerializableArgumentKind() string {
 	if widgetSetting.WidgetType != "" {
 		return widgetSetting.WidgetType
@@ -62,56 +51,57 @@ func (widgetSetting *QorWidgetSetting) GetSerializableArgumentKind() string {
 	return widgetSetting.Kind
 }
 
+// SetSerializableArgumentKind set serializable kind
 func (widgetSetting *QorWidgetSetting) SetSerializableArgumentKind(name string) {
 	widgetSetting.WidgetType = name
 	widgetSetting.Kind = name
 }
 
+// GetWidgetType get widget setting's type
+func (widgetSetting QorWidgetSetting) GetWidgetType() string {
+	return widgetSetting.WidgetType
+}
+
+// SetWidgetType set widget setting's type
+func (widgetSetting *QorWidgetSetting) SetWidgetType(widgetType string) {
+	widgetSetting.WidgetType = widgetType
+}
+
 // GetWidgetName get widget setting's group name
-func (qorWidgetSetting QorWidgetSetting) GetWidgetType() string {
-	return qorWidgetSetting.WidgetType
+func (widgetSetting QorWidgetSetting) GetWidgetName() string {
+	return widgetSetting.Name
 }
 
 // SetWidgetName set widget setting's group name
-func (qorWidgetSetting *QorWidgetSetting) SetWidgetType(widgetType string) {
-	qorWidgetSetting.WidgetType = widgetType
-}
-
-// GetWidgetName get widget setting's group name
-func (qorWidgetSetting QorWidgetSetting) GetWidgetName() string {
-	return qorWidgetSetting.Name
-}
-
-// SetWidgetName set widget setting's group name
-func (qorWidgetSetting *QorWidgetSetting) SetWidgetName(name string) {
-	qorWidgetSetting.Name = name
+func (widgetSetting *QorWidgetSetting) SetWidgetName(name string) {
+	widgetSetting.Name = name
 }
 
 // GetGroupName get widget setting's group name
-func (qorWidgetSetting QorWidgetSetting) GetGroupName() string {
-	return qorWidgetSetting.GroupName
+func (widgetSetting QorWidgetSetting) GetGroupName() string {
+	return widgetSetting.GroupName
 }
 
 // SetGroupName set widget setting's group name
-func (qorWidgetSetting *QorWidgetSetting) SetGroupName(groupName string) {
-	qorWidgetSetting.GroupName = groupName
+func (widgetSetting *QorWidgetSetting) SetGroupName(groupName string) {
+	widgetSetting.GroupName = groupName
 }
 
 // GetScope get widget's scope
-func (qorWidgetSetting QorWidgetSetting) GetScope() string {
-	return qorWidgetSetting.Scope
+func (widgetSetting QorWidgetSetting) GetScope() string {
+	return widgetSetting.Scope
 }
 
 // SetScope set widget setting's scope
-func (qorWidgetSetting *QorWidgetSetting) SetScope(scope string) {
-	qorWidgetSetting.Scope = scope
+func (widgetSetting *QorWidgetSetting) SetScope(scope string) {
+	widgetSetting.Scope = scope
 }
 
 // GetTemplate get used widget template
-func (qorWidgetSetting QorWidgetSetting) GetTemplate() string {
-	if widget := GetWidget(qorWidgetSetting.GetSerializableArgumentKind()); widget != nil {
+func (widgetSetting QorWidgetSetting) GetTemplate() string {
+	if widget := GetWidget(widgetSetting.GetSerializableArgumentKind()); widget != nil {
 		for _, value := range widget.Templates {
-			if value == qorWidgetSetting.Template {
+			if value == widgetSetting.Template {
 				return value
 			}
 		}
@@ -125,13 +115,13 @@ func (qorWidgetSetting QorWidgetSetting) GetTemplate() string {
 }
 
 // SetTemplate set used widget's template
-func (qorWidgetSetting *QorWidgetSetting) SetTemplate(template string) {
-	qorWidgetSetting.Template = template
+func (widgetSetting *QorWidgetSetting) SetTemplate(template string) {
+	widgetSetting.Template = template
 }
 
 // GetSerializableArgumentResource get setting's argument's resource
-func (qorWidgetSetting *QorWidgetSetting) GetSerializableArgumentResource() *admin.Resource {
-	widget := GetWidget(qorWidgetSetting.GetSerializableArgumentKind())
+func (widgetSetting *QorWidgetSetting) GetSerializableArgumentResource() *admin.Resource {
+	widget := GetWidget(widgetSetting.GetSerializableArgumentKind())
 	if widget != nil {
 		return widget.Setting
 	}
@@ -139,19 +129,11 @@ func (qorWidgetSetting *QorWidgetSetting) GetSerializableArgumentResource() *adm
 }
 
 // ConfigureQorResource a method used to config Widget for qor admin
-func (qorWidgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourcer) {
+func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourcer) {
 	if res, ok := res.(*admin.Resource); ok {
 		if res.GetMeta("Name") == nil {
 			res.Meta(&admin.Meta{Name: "Name"})
 		}
-
-		res.Meta(&admin.Meta{
-			Name: "ActivatedAt",
-			Type: "hidden",
-			Valuer: func(result interface{}, context *qor.Context) interface{} {
-				return time.Now()
-			},
-		})
 
 		res.Meta(&admin.Meta{
 			Name: "Scope",
@@ -263,12 +245,12 @@ func (qorWidgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Reso
 		res.IndexAttrs("Name", "CreatedAt", "UpdatedAt")
 		res.ShowAttrs("Name", "Scope", "WidgetType", "Template", "Value", "CreatedAt", "UpdatedAt")
 		res.EditAttrs(
-			"Scope", "ActivatedAt", "Widgets", "Template",
+			"Scope", "Widgets", "Template",
 			&admin.Section{
 				Title: "Settings",
 				Rows:  [][]string{{"Kind"}, {"SerializableMeta"}},
 			},
 		)
-		res.NewAttrs("Name", "Scope", "ActivatedAt", "Widgets", "Template")
+		res.NewAttrs("Name", "Scope", "Widgets", "Template")
 	}
 }

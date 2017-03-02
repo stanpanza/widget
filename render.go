@@ -59,6 +59,7 @@ func (context *Context) Funcs(funcMaps template.FuncMap) *Context {
 	return context
 }
 
+// FuncMap return funcmap
 func (context *Context) FuncMap() template.FuncMap {
 	funcMap := template.FuncMap{}
 
@@ -111,9 +112,9 @@ func (widgets *Widgets) RegisterViewPath(p string) {
 }
 
 // LoadPreviewAssets will return assets tag used for Preview
-func (w *Widgets) LoadPreviewAssets() template.HTML {
+func (widgets *Widgets) LoadPreviewAssets() template.HTML {
 	tags := ""
-	for _, asset := range w.Config.PreviewAssets {
+	for _, asset := range widgets.Config.PreviewAssets {
 		extension := filepath.Ext(asset)
 		if extension == ".css" {
 			tags += fmt.Sprintf("<link rel=\"stylesheet\" type=\"text/css\" href=\"%v\">\n", asset)

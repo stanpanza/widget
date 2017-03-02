@@ -45,6 +45,7 @@ func (context *Context) GetDB() *gorm.DB {
 	return context.Widgets.Config.DB
 }
 
+// Clone clone a context
 func (context *Context) Clone() *Context {
 	return &Context{
 		Widgets:          context.Widgets,
@@ -110,7 +111,7 @@ func (context *Context) findWidgetSetting(widgetName string, scopes []string, wi
 		settings              = widgetSettingResource.NewSlice()
 	)
 
-	db.Where("name = ? AND scope IN (?)", widgetName, scopes).Order("activated_at DESC").Find(settings)
+	db.Where("name = ? AND scope IN (?)", widgetName, scopes).Find(settings)
 
 	settingsValue := reflect.Indirect(reflect.ValueOf(settings))
 	if settingsValue.Len() > 0 {

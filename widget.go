@@ -52,17 +52,17 @@ func (widgets *Widgets) RegisterWidget(w *Widget) {
 	registeredWidgets = append(registeredWidgets, w)
 }
 
-// RegisterWidgetGroup register widgets group
+// RegisterWidgetsGroup register widgets group
 func (widgets *Widgets) RegisterWidgetsGroup(group *WidgetsGroup) {
 	registeredWidgetsGroup = append(registeredWidgetsGroup, group)
 }
 
-// // RegisterFuncMap register view funcs, it could be used when render templates
+// RegisterFuncMap register view funcs, it could be used when render templates
 func (widgets *Widgets) RegisterFuncMap(name string, fc interface{}) {
 	widgets.funcMaps[name] = fc
 }
 
-// ConfigureQorResource a method used to config Widget for qor admin
+// ConfigureQorResourceBeforeInitialize a method used to config Widget for qor admin
 func (widgets *Widgets) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 	if res, ok := res.(*admin.Resource); ok {
 		// register view paths

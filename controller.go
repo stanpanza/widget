@@ -122,8 +122,10 @@ func (wc widgetController) getWidget(context *admin.Context) (interface{}, []str
 		}
 
 		// index page
-		context.SetDB(context.GetDB().Where("scope = ? AND activated_at IS NOT NULL", scope).Order("activated_at DESC"))
+		db := context.GetDB()
+		context.SetDB(db.Where("scope = ?", scope))
 		results, err := context.FindMany()
+		context.SetDB(db)
 		return results, []string{}, err
 	}
 
@@ -155,7 +157,7 @@ func (wc widgetController) getWidget(context *admin.Context) (interface{}, []str
 		scope = "default"
 	}
 
-	DB.Model(result).Where("name = ?", context.ResourceID).Order(gorm.Expr("scope = ?, activated_at IS NULL", "default")).Find(widgetSettings)
+	DB.Model(result).Where("name = ?", context.ResourceID).Order(gorm.Expr("scope = ?", "default")).Find(widgetSettings)
 
 	widgetSettingsValues := reflect.Indirect(reflect.ValueOf(widgetSettings))
 	for i := 0; i < widgetSettingsValues.Len(); i++ {
@@ -172,7 +174,7 @@ func (wc widgetController) getWidget(context *admin.Context) (interface{}, []str
 		selectedSetting = &QorWidgetSetting{Name: context.ResourceID, Scope: "default"}
 	}
 
-	err := DB.Order("activated_at IS NULL").FirstOrInit(result, selectedSetting).Error
+	err := DB.FirstOrInit(result, selectedSetting).Error
 
 	if widgetType != "" {
 		if serializableMeta, ok := result.(serializable_meta.SerializableMetaInterface); ok && serializableMeta.GetSerializableArgumentKind() != widgetType {
