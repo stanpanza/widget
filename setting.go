@@ -29,8 +29,8 @@ type QorWidgetSettingInterface interface {
 // QorWidgetSetting default qor widget setting struct
 type QorWidgetSetting struct {
 	Name       string `gorm:"primary_key"`
-	WidgetType string `gorm:"primary_key;size:128"`
 	Scope      string `gorm:"primary_key;size:128;default:'default'"`
+	WidgetType string
 	GroupName  string
 	Template   string
 	serializable_meta.SerializableMeta
