@@ -27,12 +27,13 @@ type QorWidgetSettingInterface interface {
 
 // QorWidgetSetting default qor widget setting struct
 type QorWidgetSetting struct {
-	Name       string `gorm:"primary_key"`
-	Scope      string `gorm:"primary_key;size:128;default:'default'"`
-	Shared     bool
-	WidgetType string
-	GroupName  string
-	Template   string
+	Name        string `gorm:"primary_key"`
+	Scope       string `gorm:"primary_key;size:128;default:'default'"`
+	Description string
+	Shared      bool
+	WidgetType  string
+	GroupName   string
+	Template    string
 	serializable_meta.SerializableMeta
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -123,6 +124,10 @@ func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourc
 	if res, ok := res.(*admin.Resource); ok {
 		if res.GetMeta("Name") == nil {
 			res.Meta(&admin.Meta{Name: "Name"})
+		}
+
+		if res.GetMeta("DisplayName") == nil {
+			res.Meta(&admin.Meta{Name: "DisplayName", Label: "Name", Type: "readonly", FieldName: "Name"})
 		}
 
 		res.Meta(&admin.Meta{
@@ -245,16 +250,16 @@ func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourc
 
 		res.UseTheme("widget")
 
-		res.IndexAttrs("Name", "CreatedAt", "UpdatedAt")
-		res.ShowAttrs("Name", "Scope", "WidgetType", "Template", "Value", "CreatedAt", "UpdatedAt")
+		res.IndexAttrs("Name", "Description", "CreatedAt", "UpdatedAt")
+		res.ShowAttrs("Name", "Scope", "WidgetType", "Template", "Description", "Value", "CreatedAt", "UpdatedAt")
 		res.EditAttrs(
-			"Scope", "Widgets", "Template",
+			"DisplayName", "Description", "Scope", "Widgets", "Template",
 			&admin.Section{
 				Title: "Settings",
 				Rows:  [][]string{{"Kind"}, {"SerializableMeta"}},
 			},
 			"Shared",
 		)
-		res.NewAttrs("Name", "Scope", "Widgets", "Template")
+		res.NewAttrs("Name", "Description", "Scope", "Widgets", "Template")
 	}
 }
