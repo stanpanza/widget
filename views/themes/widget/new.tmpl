@@ -13,11 +13,33 @@
 
     <div class="qor-form-container">
       <form class="qor-form" action="{{url_for $result $resource}}" method="POST" enctype="multipart/form-data" data-action-url="{{join_url (url_for $result $resource) "!setting"}}">
-
+        
         <div class="qor-layout__widget qor-layout__widget-new" data-toggle="qor.widget">
-          {{render_form $result new_sections}}
-        </div>
+          <!-->{{render_form $result new_sections}}<-->
 
+          <ul class="qor-slideout__lists">
+            <li>
+              <h5>Products</h5>
+              <div class="qor-slideout__lists-item">
+                <a href="/admin/widget_contents/%21setting?primary_key[qor_widget_settings_scope]=&amp;primary_key[qor_widget_settings_language_code]=&amp;widget_type=Products" class="qor-widget__new">
+                  <img src="/images/Widget-NormalBanner.png"><span>Products lists</span>
+                </a>
+                <a href="/admin/widget_contents/%21setting?primary_key[qor_widget_settings_scope]=&amp;primary_key[qor_widget_settings_language_code]=&amp;widget_type=Products" class="qor-widget__new">
+                  <img src="/images/Widget-NormalBanner.png"><span>Products recommended</span>
+                </a>
+              </div>
+            </li>
+            <li>
+              <h5>Banners</h5>
+              <div class="qor-slideout__lists-item">
+                <a href="/admin/widget_contents/%21setting?primary_key[qor_widget_settings_scope]=&amp;primary_key[qor_widget_settings_language_code]=&amp;widget_type=Products" class="qor-widget__new">
+                  <img src="/images/Widget-Products.png"><span>ToppageBanner</span>
+                </a>
+              </div>
+            </li>
+          </ul>
+        </div>
+        
         <div class="qor-layout__widget-setting"></div>
 
         {{if has_update_permission $resource}}

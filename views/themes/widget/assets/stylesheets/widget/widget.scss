@@ -1,0 +1,22 @@
+.qor-slideout__lists {
+    margin: 24px 0;
+    padding: 0;
+    li {
+        list-style: none;
+        padding: 0;
+        margin: 12px 0;
+    }
+    .qor-slideout__lists-item {
+        padding-left: 16px;
+        img {
+            max-width: none;
+            width: 200px;
+            margin-right: 8px;
+            display: block;
+        }
+        a {
+            display: block;
+            margin-bottom: 12px;
+        }
+    }
+}
