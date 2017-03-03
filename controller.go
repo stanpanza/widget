@@ -138,19 +138,13 @@ func (wc widgetController) getWidget(context *admin.Context) (interface{}, []str
 
 	if scope == "" {
 		scope = context.Request.Form.Get("QorResource.Scope")
+		if scope == "" {
+			scope = "default"
+		}
 	}
 
 	if widgetType == "" {
 		widgetType = context.Request.Form.Get("QorResource.Kind")
-	}
-
-	// disable composite primary key mode when specfied scope or widget type
-	if scope != "" {
-		DB = DB.Set(admin.DisableCompositePrimaryKeyMode, "on")
-	}
-
-	if scope == "" {
-		scope = "default"
 	}
 
 	err := DB.FirstOrInit(result, QorWidgetSetting{Name: context.ResourceID, Scope: scope}).Error

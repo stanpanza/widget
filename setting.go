@@ -13,8 +13,6 @@ import (
 
 // QorWidgetSettingInterface qor widget setting interface
 type QorWidgetSettingInterface interface {
-	GetWidgetType() string
-	SetWidgetType(string)
 	GetWidgetName() string
 	SetWidgetName(string)
 	GetGroupName() string
@@ -55,16 +53,6 @@ func (widgetSetting *QorWidgetSetting) GetSerializableArgumentKind() string {
 func (widgetSetting *QorWidgetSetting) SetSerializableArgumentKind(name string) {
 	widgetSetting.WidgetType = name
 	widgetSetting.Kind = name
-}
-
-// GetWidgetType get widget setting's type
-func (widgetSetting QorWidgetSetting) GetWidgetType() string {
-	return widgetSetting.WidgetType
-}
-
-// SetWidgetType set widget setting's type
-func (widgetSetting *QorWidgetSetting) SetWidgetType(widgetType string) {
-	widgetSetting.WidgetType = widgetType
 }
 
 // GetWidgetName get widget setting's group name
