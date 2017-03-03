@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"
 	"github.com/qor/qor"
 	"github.com/qor/qor/resource"
@@ -28,6 +29,7 @@ type QorWidgetSettingInterface interface {
 type QorWidgetSetting struct {
 	Name       string `gorm:"primary_key"`
 	Scope      string `gorm:"primary_key;size:128;default:'default'"`
+	Shared     bool
 	WidgetType string
 	GroupName  string
 	Template   string
@@ -220,6 +222,19 @@ func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourc
 			},
 		})
 
+		res.Meta(&admin.Meta{
+			Name:  "Shared",
+			Label: "This widget is shared",
+		})
+
+		res.Scope(&admin.Scope{
+			Name:  "Shared",
+			Label: "Shared Widgets",
+			Handle: func(db *gorm.DB, _ *qor.Context) *gorm.DB {
+				return db.Where("shared = ?", true)
+			},
+		})
+
 		res.Action(&admin.Action{
 			Name: "Preview",
 			URL: func(record interface{}, context *admin.Context) string {
@@ -238,6 +253,7 @@ func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourc
 				Title: "Settings",
 				Rows:  [][]string{{"Kind"}, {"SerializableMeta"}},
 			},
+			"Shared",
 		)
 		res.NewAttrs("Name", "Scope", "Widgets", "Template")
 	}
