@@ -19,7 +19,7 @@
 
           <ul class="qor-slideout__lists">
             <li>
-              <h5>Products</h5>
+              <h5 class="qor-slideout__lists-groupname">Products</h5>
               <div class="qor-slideout__lists-item">
                 <a href="/admin/widget_contents/%21setting?primary_key[qor_widget_settings_scope]=&amp;primary_key[qor_widget_settings_language_code]=&amp;widget_type=Products" class="qor-widget__new">
                   <img src="/images/Widget-NormalBanner.png"><span>Products lists</span>
@@ -27,10 +27,16 @@
                 <a href="/admin/widget_contents/%21setting?primary_key[qor_widget_settings_scope]=&amp;primary_key[qor_widget_settings_language_code]=&amp;widget_type=Products" class="qor-widget__new">
                   <img src="/images/Widget-NormalBanner.png"><span>Products recommended</span>
                 </a>
+                <a href="/admin/widget_contents/%21setting?primary_key[qor_widget_settings_scope]=&amp;primary_key[qor_widget_settings_language_code]=&amp;widget_type=Products" class="qor-widget__new">
+                  <img src="/images/Widget-NormalBanner.png"><span>Products recommended</span>
+                </a>
+                <a href="/admin/widget_contents/%21setting?primary_key[qor_widget_settings_scope]=&amp;primary_key[qor_widget_settings_language_code]=&amp;widget_type=Products" class="qor-widget__new">
+                  <img src="/images/Widget-NormalBanner.png"><span>Products recommended</span>
+                </a>
               </div>
             </li>
             <li>
-              <h5>Banners</h5>
+              <h5 class="qor-slideout__lists-groupname">Banners</h5>
               <div class="qor-slideout__lists-item">
                 <a href="/admin/widget_contents/%21setting?primary_key[qor_widget_settings_scope]=&amp;primary_key[qor_widget_settings_language_code]=&amp;widget_type=Products" class="qor-widget__new">
                   <img src="/images/Widget-Products.png"><span>ToppageBanner</span>
@@ -38,16 +44,17 @@
               </div>
             </li>
           </ul>
+
+          <div class="qor-layout__widget-setting"></div>
+          {{if has_update_permission $resource}}
+            <div class="qor-form__actions qor-layout__widget-actions" style="display: none;">
+              <button class="mdl-button mdl-button--colored mdl-button--raised mdl-js-button mdl-js-ripple-effect qor-button--save" type="submit">{{t "qor_admin.form.save" "Save"}}</button>
+              <a class="mdl-button mdl-button--primary mdl-js-button mdl-js-ripple-effect qor-widget__cancel" href="javascript://">{{t "qor_admin.form.cancel" "Cancel"}}</a>
+            </div>
+          {{end}}
+          
         </div>
         
-        <div class="qor-layout__widget-setting"></div>
-
-        {{if has_update_permission $resource}}
-          <div class="qor-form__actions">
-            <button class="mdl-button mdl-button--colored mdl-button--raised mdl-js-button mdl-js-ripple-effect qor-button--save" type="submit">{{t "qor_admin.form.save_changes" "Save Changes"}}</button>
-            <a class="mdl-button mdl-button--primary mdl-js-button mdl-js-ripple-effect qor-button--cancel" href="javascript:history.back();">{{t "qor_admin.form.cancel_edit" "Cancel Edit"}}</a>
-          </div>
-        {{end}}
       </form>
     </div>
   </div>

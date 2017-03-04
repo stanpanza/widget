@@ -38,18 +38,22 @@
         init: function () {
             this.bind();
             this.isNewForm = this.$element.hasClass(CLASS_IS_NEW);
-            this.addWidgetSlideout();
+            !this.isNewForm && this.addWidgetSlideout();
             this.initSelect();
         },
 
         bind: function () {
             this.$element
                 .on(EVENT_CHANGE, 'select', this.change.bind(this))
-                .on(EVENT_CLICK, '.qor-widget__new', this.loadForm.bind(this));
+                .on(EVENT_CLICK, '.qor-widget__new', this.getFormHtml.bind(this))
+                .on(EVENT_CLICK, '.qor-widget__cancel', this.cancelForm.bind(this));
         },
 
         unbind: function () {
-            this.$element.off(EVENT_CHANGE, 'select', this.change.bind(this));
+            this.$element
+                .off(EVENT_CHANGE, 'select', this.change.bind(this))
+                .off(EVENT_CLICK, '.qor-widget__new', this.getFormHtml.bind(this));
+
         },
 
         initSelect: function () {
@@ -65,9 +69,7 @@
                 }
             });
 
-            if (this.isNewForm) {
-                // $(TARGET_WIDGET).trigger('change');
-            } else {
+            if (!this.isNewForm) {
                 if (!$kind.parent().next('.qor-form-section-rows').children().length) {
                     $kind.parent().next('.qor-form-section-rows').append(HINT_TEMPLATE);
                     if (!$element.find('.qor-field__label').not($kind.closest('.qor-form-section').find('.qor-field__label')).is(':visible')) {
@@ -114,7 +116,7 @@
         },
 
         change: function (e) {
-            var $target = $(e.target),
+            let $target = $(e.target),
                 widgetValue = $target.val(),
                 isInSlideout = $('.qor-slideout').is(':visible'),
                 clickClass = '.qor-widget-' + widgetValue,
@@ -128,9 +130,7 @@
             $.fn.qorSlideoutBeforeHide = null;
             window.onbeforeunload = null;
 
-            if (this.isNewForm) {
-                this.getFormHtml(url);
-            } else {
+            if (!this.isNewForm) {
                 if (isInSlideout) {
                     $link.trigger('click');
                 } else {
@@ -141,21 +141,41 @@
             return false;
         },
 
-        loadForm: function (e) {
-            this.getFormHtml($(e.target).closest('a').attr('href'));
-            return false;
-        },
-
-        getFormHtml: function (url) {
-            var $setting = $(CLASS_FORM_SETTING),
+        getFormHtml: function (e) {
+            let $target = $(e.target).closest('a'),
+                $element = this.$element,
+                url = $target.attr('href'),
+                $setting = $(CLASS_FORM_SETTING),
                 $loading = $(QorWidget.TEMPLATE_LOADING).appendTo($setting);
 
+            if ($target.hasClass('isShow')) {
+                return;
+            }
+
+            $target.addClass('isShow');
+            $element.find('.qor-slideout__lists-item a').not($target).hide();
+            $element.find('.qor-slideout__lists-groupname').hide();
+            $element.find('.qor-layout__widget-actions').show();
+            $target.closest('li').find('.qor-slideout__lists-groupname').show();
+
             window.componentHandler.upgradeElement($loading.children()[0]);
+
             $.get(url, function (html) {
                 $setting.html(html).trigger('enable');
             }).fail(function () {
                 window.alert('server error, please try again!');
             });
+
+            return false;
+        },
+
+        cancelForm: function () {
+            let $element = this.$element;
+
+            $element.find('.qor-slideout__lists-item a').removeClass('isShow').show();
+            $element.find('.qor-slideout__lists-groupname').show();
+            $element.find('.qor-layout__widget-actions').hide();
+            $element.find(CLASS_FORM_SETTING).html('');
         },
 
         destroy: function () {
@@ -170,9 +190,9 @@
 
     QorWidget.plugin = function (options) {
         return this.each(function () {
-            var $this = $(this);
-            var data = $this.data(NAMESPACE);
-            var fn;
+            let $this = $(this),
+                data = $this.data(NAMESPACE),
+                fn;
 
             if (!data) {
                 if (/destroy/.test(options)) {
@@ -189,7 +209,7 @@
     };
 
     $(function () {
-        var selector = '[data-toggle="qor.widget"]';
+        let selector = '[data-toggle="qor.widget"]';
 
         $(document)
             .on(EVENT_DISABLE, function (e) {

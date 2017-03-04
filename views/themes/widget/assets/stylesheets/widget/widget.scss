@@ -7,16 +7,18 @@
         margin: 12px 0;
     }
     .qor-slideout__lists-item {
-        padding-left: 16px;
         img {
-            max-width: none;
-            width: 200px;
-            margin-right: 8px;
+            max-width: 100%;
+            max-height: 90px;
+            width: auto;
+            margin: 0 auto;
             display: block;
         }
-        a {
-            display: block;
-            margin-bottom: 12px;
+        >a {
+            display: inline-block;
+            width: 30%;
+            margin-bottom: 24px;
+            text-align: center;
         }
     }
 }
