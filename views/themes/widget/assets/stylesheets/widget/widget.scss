@@ -16,9 +16,20 @@
         }
         >a {
             display: inline-block;
-            width: 30%;
+            vertical-align: top;
+            width: 27%;
+            margin-right: 2%;
             margin-bottom: 24px;
             text-align: center;
+            &::nth-child(3n) {
+                margin-right: 0;
+            }
         }
+    }
+}
+
+.qor-bottomsheets__body {
+    .qor-layout__widget-new {
+        padding: 0 24px 0 40px;
     }
 }

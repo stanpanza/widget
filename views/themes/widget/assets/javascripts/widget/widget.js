@@ -146,19 +146,19 @@
                 $element = this.$element,
                 url = $target.attr('href'),
                 $setting = $(CLASS_FORM_SETTING),
-                $loading = $(QorWidget.TEMPLATE_LOADING).appendTo($setting);
+                $loading = $(QorWidget.TEMPLATE_LOADING);
 
             if ($target.hasClass('isShow')) {
-                return;
+                return false;
             }
+
+            $loading.appendTo($setting).trigger('enable');
 
             $target.addClass('isShow');
             $element.find('.qor-slideout__lists-item a').not($target).hide();
             $element.find('.qor-slideout__lists-groupname').hide();
             $element.find('.qor-layout__widget-actions').show();
             $target.closest('li').find('.qor-slideout__lists-groupname').show();
-
-            window.componentHandler.upgradeElement($loading.children()[0]);
 
             $.get(url, function (html) {
                 $setting.html(html).trigger('enable');
