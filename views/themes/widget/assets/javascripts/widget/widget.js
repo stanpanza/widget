@@ -143,8 +143,11 @@
 
         getFormHtml: function (e) {
             let $target = $(e.target).closest('a'),
+                widgetType = $target.data('widget-type'),
                 $element = this.$element,
                 url = $target.attr('href'),
+                $title = $element.find('.qor-layout__widget-selector'),
+                $selector = $title.find('select'),
                 $setting = $(CLASS_FORM_SETTING),
                 $loading = $(QorWidget.TEMPLATE_LOADING);
 
@@ -161,6 +164,8 @@
             $target.closest('li').find('.qor-slideout__lists-groupname').show();
 
             $.get(url, function (html) {
+                $title.show();
+                $selector.val(widgetType).closest('.qor-form-section').hide();
                 $setting.html(html).trigger('enable');
             }).fail(function () {
                 window.alert('server error, please try again!');
@@ -174,7 +179,7 @@
 
             $element.find('.qor-slideout__lists-item a').removeClass('isShow').show();
             $element.find('.qor-slideout__lists-groupname').show();
-            $element.find('.qor-layout__widget-actions').hide();
+            $element.find('.qor-layout__widget-actions, .qor-layout__widget-selector').hide();
             $element.find(CLASS_FORM_SETTING).html('');
         },
 
