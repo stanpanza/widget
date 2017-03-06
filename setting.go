@@ -24,6 +24,10 @@ type QorWidgetSettingInterface interface {
 	SetScope(string)
 	GetTemplate() string
 	SetTemplate(string)
+	GetSourceType() string
+	SetSourceType(string)
+	GetSourceID() string
+	SetSourceID(string)
 	serializable_meta.SerializableMetaInterface
 }
 
@@ -31,6 +35,8 @@ type QorWidgetSettingInterface interface {
 type QorWidgetSetting struct {
 	Name        string `gorm:"primary_key"`
 	Scope       string `gorm:"primary_key;size:128;default:'default'"`
+	SourceType  string `gorm:"primary_key;default:''"`
+	SourceID    string `gorm:"primary_key;default:''"`
 	Description string
 	Shared      bool
 	WidgetType  string
@@ -96,6 +102,26 @@ func (widgetSetting *QorWidgetSetting) SetScope(scope string) {
 	widgetSetting.Scope = scope
 }
 
+// GetSourceType get widget's source type
+func (widgetSetting QorWidgetSetting) GetSourceType() string {
+	return widgetSetting.SourceID
+}
+
+// SetSourceType set widget setting's souce type
+func (widgetSetting *QorWidgetSetting) SetSourceType(sourceType string) {
+	widgetSetting.SourceType = sourceType
+}
+
+// GetSourceID get widget's source ID
+func (widgetSetting QorWidgetSetting) GetSourceID() string {
+	return widgetSetting.SourceID
+}
+
+// SetSourceID set widget setting's source id
+func (widgetSetting *QorWidgetSetting) SetSourceID(sourceID string) {
+	widgetSetting.SourceID = sourceID
+}
+
 // GetTemplate get used widget template
 func (widgetSetting QorWidgetSetting) GetTemplate() string {
 	if widget := GetWidget(widgetSetting.GetSerializableArgumentKind()); widget != nil {
@@ -158,6 +184,54 @@ func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourc
 				Setter: func(result interface{}, metaValue *resource.MetaValue, context *qor.Context) {
 					if setting, ok := result.(QorWidgetSettingInterface); ok {
 						setting.SetScope(utils.ToString(metaValue.Value))
+					}
+				},
+			})
+		}
+
+		if res.GetMeta("SourceType") == nil {
+			res.Meta(&admin.Meta{
+				Name: "SourceType",
+				Type: "hidden",
+				Valuer: func(result interface{}, context *qor.Context) interface{} {
+					if sourceType := context.Request.URL.Query().Get("widget_source_type"); sourceType != "" {
+						return sourceType
+					}
+
+					if setting, ok := result.(QorWidgetSettingInterface); ok {
+						if sourceType := setting.GetSourceType(); sourceType != "" {
+							return sourceType
+						}
+					}
+					return ""
+				},
+				Setter: func(result interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+					if setting, ok := result.(QorWidgetSettingInterface); ok {
+						setting.SetSourceType(utils.ToString(metaValue.Value))
+					}
+				},
+			})
+		}
+
+		if res.GetMeta("SourceID") == nil {
+			res.Meta(&admin.Meta{
+				Name: "SourceID",
+				Type: "hidden",
+				Valuer: func(result interface{}, context *qor.Context) interface{} {
+					if sourceID := context.Request.URL.Query().Get("widget_source_id"); sourceID != "" {
+						return sourceID
+					}
+
+					if setting, ok := result.(QorWidgetSettingInterface); ok {
+						if sourceID := setting.GetSourceID(); sourceID != "" {
+							return sourceID
+						}
+					}
+					return ""
+				},
+				Setter: func(result interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+					if setting, ok := result.(QorWidgetSettingInterface); ok {
+						setting.SetSourceID(utils.ToString(metaValue.Value))
 					}
 				},
 			})
