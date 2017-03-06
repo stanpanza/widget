@@ -12,57 +12,24 @@
 
   <div class="qor-form-container">
     <form class="qor-form" action="{{url_for $result $resource}}" method="POST" enctype="multipart/form-data" data-action-url="{{join_url (url_for $result $resource) "!setting"}}">
-      
+
       <div class="qor-layout__widget qor-layout__widget-new" data-toggle="qor.widget">
         <ul class="qor-slideout__lists">
-          <li>
-            <h5 class="qor-slideout__lists-groupname">Products</h5>
-            <div class="qor-slideout__lists-item">
-              <a href="/admin/widget_contents/%21setting?primary_key[qor_widget_settings_scope]=&amp;primary_key[qor_widget_settings_language_code]=&amp;widget_type=Products" data-widget-type="Products" class="qor-widget__new">
-                <img src="/images/Widget-NormalBanner.png"><span>Products lists</span>
-              </a>
-            </div>
-          </li>
-          <li>
-            <h5 class="qor-slideout__lists-groupname">Banners</h5>
-            <div class="qor-slideout__lists-item">
-              <a href="/admin/widget_contents/%21setting?primary_key[qor_widget_settings_scope]=&amp;primary_key[qor_widget_settings_language_code]=&amp;widget_type=NormalBanner" data-widget-type="NormalBanner" class="qor-widget__new">
-                <img src="/images/Widget-Products.png"><span>ToppageBanner</span>
-              </a>
-            </div>
-          </li>
-          <li>
-            <h5 class="qor-slideout__lists-groupname">Slide</h5>
-            <div class="qor-slideout__lists-item">
-              <a href="/admin/widget_contents/%21setting?primary_key[qor_widget_settings_scope]=&amp;primary_key[qor_widget_settings_language_code]=&amp;widget_type=SlideShow" data-widget-type="SlideShow" class="qor-widget__new">
-                <img src="/images/Widget-Products.png"><span>SlideShow</span>
-              </a>
-            </div>
-          </li>
-          <li>
-            <h5 class="qor-slideout__lists-groupname">Slide</h5>
-            <div class="qor-slideout__lists-item">
-              <a href="/admin/widget_contents/%21setting?primary_key[qor_widget_settings_scope]=&amp;primary_key[qor_widget_settings_language_code]=&amp;widget_type=SlideShow" data-widget-type="SlideShow" class="qor-widget__new">
-                <img src="/images/Widget-Products.png"><span>SlideShow</span>
-              </a>
-            </div>
-          </li>
-          <li>
-            <h5 class="qor-slideout__lists-groupname">Slide</h5>
-            <div class="qor-slideout__lists-item">
-              <a href="/admin/widget_contents/%21setting?primary_key[qor_widget_settings_scope]=&amp;primary_key[qor_widget_settings_language_code]=&amp;widget_type=SlideShow" data-widget-type="SlideShow" class="qor-widget__new">
-                <img src="/images/Widget-Products.png"><span>SlideShow</span>
-              </a>
-            </div>
-          </li>
-          <li>
-            <h5 class="qor-slideout__lists-groupname">Slide</h5>
-            <div class="qor-slideout__lists-item">
-              <a href="/admin/widget_contents/%21setting?primary_key[qor_widget_settings_scope]=&amp;primary_key[qor_widget_settings_language_code]=&amp;widget_type=SlideShow" data-widget-type="SlideShow" class="qor-widget__new">
-                <img src="/images/Widget-Products.png"><span>SlideShow</span>
-              </a>
-            </div>
-          </li>
+          {{range $groupWidget := widget_grouped_widgets}}
+            <li>
+              <h5 class="qor-slideout__lists-groupname">{{t (printf "qor_widgets.group.%v" $groupWidget.Group) $groupWidget.Group}}</h5>
+              {{range $widget := $groupWidget.Widgets}}
+                <div class="qor-slideout__lists-item">
+                  <a href="{{patch_url (join_url (url_for $resource) "!setting") "widget_type" $widget.Name}}" data-widget-type="{{$widget.Name}}" class="qor-widget__new">
+                    {{if $widget.PreviewIcon}}
+                      <img src="{{$widget.PreviewIcon}}">
+                    {{end}}
+                    <span>{{$widget.Name}}</span>
+                  </a>
+                </div>
+              {{end}}
+            </li>
+          {{end}}
         </ul>
 
         <div class="qor-layout__widget-selector" style="display: none;">
@@ -76,9 +43,9 @@
             <a class="mdl-button mdl-button--primary mdl-js-button mdl-js-ripple-effect qor-widget__cancel" href="javascript://">{{t "qor_admin.form.cancel" "Cancel"}}</a>
           </div>
         {{end}}
-        
+
       </div>
-      
+
     </form>
   </div>
 </div>
