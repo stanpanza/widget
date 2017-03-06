@@ -18,16 +18,16 @@
           {{range $groupWidget := widget_grouped_widgets}}
             <li>
               <h5 class="qor-slideout__lists-groupname">{{t (printf "qor_widgets.group.%v" $groupWidget.Group) $groupWidget.Group}}</h5>
-              {{range $widget := $groupWidget.Widgets}}
                 <div class="qor-slideout__lists-item">
+                  {{range $widget := $groupWidget.Widgets}}
                   <a href="{{patch_url (join_url (url_for $resource) "!setting") "widget_type" $widget.Name}}" data-widget-type="{{$widget.Name}}" class="qor-widget__new">
                     {{if $widget.PreviewIcon}}
                       <img src="{{$widget.PreviewIcon}}">
                     {{end}}
                     <span>{{$widget.Name}}</span>
                   </a>
+                  {{end}}
                 </div>
-              {{end}}
             </li>
           {{end}}
         </ul>
