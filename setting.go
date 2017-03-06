@@ -6,6 +6,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"
+	"github.com/qor/media/oss"
 	"github.com/qor/qor"
 	"github.com/qor/qor/resource"
 	"github.com/qor/qor/utils"
@@ -14,6 +15,7 @@ import (
 
 // QorWidgetSettingInterface qor widget setting interface
 type QorWidgetSettingInterface interface {
+	GetPreviewIcon() string
 	GetWidgetName() string
 	SetWidgetName(string)
 	GetGroupName() string
@@ -34,6 +36,7 @@ type QorWidgetSetting struct {
 	WidgetType  string
 	GroupName   string
 	Template    string
+	PreviewIcon oss.OSS
 	serializable_meta.SerializableMeta
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -56,6 +59,11 @@ func (widgetSetting *QorWidgetSetting) GetSerializableArgumentKind() string {
 func (widgetSetting *QorWidgetSetting) SetSerializableArgumentKind(name string) {
 	widgetSetting.WidgetType = name
 	widgetSetting.Kind = name
+}
+
+// GetPreviewIcon get preview icon
+func (widgetSetting QorWidgetSetting) GetPreviewIcon() string {
+	return widgetSetting.PreviewIcon.URL()
 }
 
 // GetWidgetName get widget setting's group name
