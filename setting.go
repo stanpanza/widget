@@ -2,11 +2,11 @@ package widget
 
 import (
 	"fmt"
+	"html/template"
 	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"
-	"github.com/qor/media/oss"
 	"github.com/qor/qor"
 	"github.com/qor/qor/resource"
 	"github.com/qor/qor/utils"
@@ -15,7 +15,6 @@ import (
 
 // QorWidgetSettingInterface qor widget setting interface
 type QorWidgetSettingInterface interface {
-	GetPreviewIcon() string
 	GetWidgetName() string
 	SetWidgetName(string)
 	GetGroupName() string
@@ -44,7 +43,6 @@ type QorWidgetSetting struct {
 	WidgetType  string
 	GroupName   string
 	Template    string
-	PreviewIcon oss.OSS
 	serializable_meta.SerializableMeta
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -67,11 +65,6 @@ func (widgetSetting *QorWidgetSetting) GetSerializableArgumentKind() string {
 func (widgetSetting *QorWidgetSetting) SetSerializableArgumentKind(name string) {
 	widgetSetting.WidgetType = name
 	widgetSetting.Kind = name
-}
-
-// GetPreviewIcon get preview icon
-func (widgetSetting QorWidgetSetting) GetPreviewIcon() string {
-	return widgetSetting.PreviewIcon.URL()
 }
 
 // GetWidgetName get widget setting's group name
@@ -170,6 +163,17 @@ func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourc
 	if res, ok := res.(*admin.Resource); ok {
 		if res.GetMeta("Name") == nil {
 			res.Meta(&admin.Meta{Name: "Name"})
+		}
+
+		if res.GetMeta("PreviewIcon") == nil {
+			res.Meta(&admin.Meta{Name: "PreviewIcon", Valuer: func(result interface{}, context *qor.Context) interface{} {
+				if setting, ok := result.(QorWidgetSettingInterface); ok {
+					if widget := GetWidget(setting.GetSerializableArgumentKind()); widget != nil {
+						return template.HTML(fmt.Sprintf("<img class='qor-preview-icon' src='%v'/>", widget.PreviewIcon))
+					}
+				}
+				return ""
+			}})
 		}
 
 		if res.GetMeta("DisplayName") == nil {
@@ -362,8 +366,8 @@ func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourc
 
 		res.UseTheme("widget")
 
-		res.IndexAttrs("Name", "Description", "CreatedAt", "UpdatedAt")
-		res.ShowAttrs("Name", "Scope", "WidgetType", "Template", "Description", "Value", "CreatedAt", "UpdatedAt")
+		res.IndexAttrs("PreviewIcon", "Name", "Description", "CreatedAt", "UpdatedAt")
+		res.ShowAttrs("PreviewIcon", "Name", "Scope", "WidgetType", "Template", "Description", "Value", "CreatedAt", "UpdatedAt")
 		res.EditAttrs(
 			"DisplayName", "Description", "Scope", "Widgets", "Template",
 			&admin.Section{
