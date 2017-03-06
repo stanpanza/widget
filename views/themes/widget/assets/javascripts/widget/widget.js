@@ -149,10 +149,15 @@
                 $title = $element.find('.qor-layout__widget-selector'),
                 $selector = $title.find('select'),
                 $setting = $(CLASS_FORM_SETTING),
+                $sectionSetting = $element.find('[data-section-title="Settings"]'),
                 $loading = $(QorWidget.TEMPLATE_LOADING);
 
             if ($target.hasClass('isShow')) {
                 return false;
+            }
+
+            if ($sectionSetting.length) {
+                $setting = $sectionSetting;
             }
 
             $loading.appendTo($setting).trigger('enable');

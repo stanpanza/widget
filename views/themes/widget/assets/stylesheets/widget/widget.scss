@@ -28,6 +28,14 @@
     }
 }
 
+.qor-layout__widget-new {
+    .qor-layout__widget-selector {
+        &+[data-section-title="Settings"] {
+            display: none;
+        }
+    }
+}
+
 .qor-bottomsheets__body {
     .qor-layout__widget-new {
         padding: 0 24px 0 40px;
