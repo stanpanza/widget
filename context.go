@@ -16,6 +16,8 @@ type Context struct {
 	AvailableWidgets []string
 	Options          map[string]interface{}
 	InlineEdit       bool
+	SourceType       string
+	SourceID         string
 	FuncMaps         template.FuncMap
 	WidgetSetting    QorWidgetSettingInterface
 }
@@ -111,7 +113,11 @@ func (context *Context) findWidgetSetting(widgetName string, scopes []string, wi
 		settings              = widgetSettingResource.NewSlice()
 	)
 
-	db.Where("name = ? AND scope IN (?)", widgetName, scopes).Find(settings)
+	if context.SourceID != "" {
+		db.Order("source_id DESC").Where("name = ? AND scope IN (?) AND (shared = ? OR (source_type = ? AND source_id = ?))", widgetName, scopes, true, context.SourceType, context.SourceID).Find(settings)
+	} else {
+		db.Where("name = ? AND scope IN (?)", widgetName, scopes).Find(settings)
+	}
 
 	settingsValue := reflect.Indirect(reflect.ValueOf(settings))
 	if settingsValue.Len() > 0 {
@@ -127,19 +133,21 @@ func (context *Context) findWidgetSetting(widgetName string, scopes []string, wi
 		}
 	}
 
-	if setting == nil {
-		if widgetGroupName == "" {
-			utils.ExitWithMsg("Widget: Can't Create Widget Without Widget Type")
-			return nil
+	if context.SourceType == "" {
+		if setting == nil {
+			if widgetGroupName == "" {
+				utils.ExitWithMsg("Widget: Can't Create Widget Without Widget Type")
+				return nil
+			}
+			setting = widgetSettingResource.NewStruct().(QorWidgetSettingInterface)
+			setting.SetWidgetName(widgetName)
+			setting.SetGroupName(widgetGroupName)
+			setting.SetSerializableArgumentKind(widgetGroupName)
+			db.Create(setting)
+		} else if setting.GetGroupName() != widgetGroupName {
+			setting.SetGroupName(widgetGroupName)
+			db.Save(setting)
 		}
-		setting = widgetSettingResource.NewStruct().(QorWidgetSettingInterface)
-		setting.SetWidgetName(widgetName)
-		setting.SetGroupName(widgetGroupName)
-		setting.SetSerializableArgumentKind(widgetGroupName)
-		db.Create(setting)
-	} else if setting.GetGroupName() != widgetGroupName {
-		setting.SetGroupName(widgetGroupName)
-		db.Save(setting)
 	}
 
 	return setting
