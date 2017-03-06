@@ -355,7 +355,13 @@ func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourc
 				Title: "Settings",
 				Rows:  [][]string{{"Kind"}, {"SerializableMeta"}},
 			},
-			"Shared",
+			"Shared", "SourceType", "SourceID",
 		)
+
+		searchHandler := res.SearchHandler
+		res.SearchHandler = func(keyword string, context *qor.Context) *gorm.DB {
+			context.SetDB(context.GetDB().Where("source_type = ?", ""))
+			return searchHandler(keyword, context)
+		}
 	}
 }
