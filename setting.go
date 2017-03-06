@@ -28,6 +28,8 @@ type QorWidgetSettingInterface interface {
 	SetSourceType(string)
 	GetSourceID() string
 	SetSourceID(string)
+	GetShared() bool
+	SetShared(bool)
 	serializable_meta.SerializableMetaInterface
 }
 
@@ -120,6 +122,16 @@ func (widgetSetting QorWidgetSetting) GetSourceID() string {
 // SetSourceID set widget setting's source id
 func (widgetSetting *QorWidgetSetting) SetSourceID(sourceID string) {
 	widgetSetting.SourceID = sourceID
+}
+
+// GetShared get widget's source ID
+func (widgetSetting QorWidgetSetting) GetShared() bool {
+	return widgetSetting.Shared
+}
+
+// SetShared set widget setting's source id
+func (widgetSetting *QorWidgetSetting) SetShared(shared bool) {
+	widgetSetting.Shared = shared
 }
 
 // GetTemplate get used widget template
@@ -338,6 +350,16 @@ func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourc
 			Modes: []string{"edit", "menu_item"},
 		})
 
+		res.AddProcessor(func(value interface{}, metaValues *resource.MetaValues, context *qor.Context) error {
+			if widgetSetting, ok := value.(QorWidgetSettingInterface); ok {
+				if widgetSetting.GetShared() {
+					widgetSetting.SetSourceType("")
+					widgetSetting.SetSourceID("")
+				}
+			}
+			return nil
+		})
+
 		res.UseTheme("widget")
 
 		res.IndexAttrs("Name", "Description", "CreatedAt", "UpdatedAt")
@@ -348,7 +370,7 @@ func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourc
 				Title: "Settings",
 				Rows:  [][]string{{"Kind"}, {"SerializableMeta"}},
 			},
-			"Shared",
+			"Shared", "SourceType", "SourceID",
 		)
 		res.NewAttrs("Name", "Description", "Scope", "Widgets", "Template",
 			&admin.Section{
