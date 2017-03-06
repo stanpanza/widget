@@ -8,19 +8,25 @@
     }
     .qor-slideout__lists-item {
         img {
-            max-width: 100%;
+            width: 100%;
             max-height: 90px;
-            width: auto;
             margin: 0 auto;
             display: block;
+            margin-bottom: 8px;
         }
         >a {
             display: inline-block;
             vertical-align: top;
+            padding: 8px;
+            border-radius: 2px;
             width: 27%;
+            color: rgba(0, 0, 0, .75);
             margin-right: 2%;
             margin-bottom: 24px;
             text-align: center;
+            &:hover {
+                background-color: rgba(0, 0, 0, .04);
+            }
             &::nth-child(3n) {
                 margin-right: 0;
             }
