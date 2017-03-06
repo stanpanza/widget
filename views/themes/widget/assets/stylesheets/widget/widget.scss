@@ -47,3 +47,21 @@
         padding: 0 24px 0 40px;
     }
 }
+
+.qor-theme-widget {
+    .qor-table__content {
+        overflow: inherit;
+        max-height: none;
+    }
+    .mdl-data-table td,
+    .mdl-data-table tbody tr {
+        height: auto;
+    }
+    .qor-table img {
+        &.qor-preview-icon {
+            width: 120px !important;
+            height: auto !important;
+            max-height: 80px;
+        }
+    }
+}
