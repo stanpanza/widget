@@ -46,6 +46,12 @@
     .qor-layout__widget-new {
         padding: 0 24px 0 40px;
     }
+
+    .qor-slideout__lists {
+        .qor-slideout__lists-item > a {
+            width: 41%;
+        }
+    }
 }
 
 .qor-theme-widget {
