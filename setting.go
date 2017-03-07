@@ -99,7 +99,7 @@ func (widgetSetting *QorWidgetSetting) SetScope(scope string) {
 
 // GetSourceType get widget's source type
 func (widgetSetting QorWidgetSetting) GetSourceType() string {
-	return widgetSetting.SourceID
+	return widgetSetting.SourceType
 }
 
 // SetSourceType set widget setting's souce type
