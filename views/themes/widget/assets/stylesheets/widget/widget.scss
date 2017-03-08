@@ -44,11 +44,10 @@
 
 .qor-bottomsheets__body {
     .qor-layout__widget-new {
-        padding: 0 24px 0 40px;
+        padding: 0 24px 0 0;
     }
-
     .qor-slideout__lists {
-        .qor-slideout__lists-item > a {
+        .qor-slideout__lists-item>a {
             width: 41%;
         }
     }
