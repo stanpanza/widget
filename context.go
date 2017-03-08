@@ -6,6 +6,8 @@ import (
 	"reflect"
 
 	"github.com/jinzhu/gorm"
+	"github.com/qor/admin"
+	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
 )
 
@@ -77,12 +79,12 @@ func (context *Context) Render(widgetName string, widgetGroupName string) templa
 
 	if setting := context.findWidgetSetting(widgetName, append(visibleScopes, "default"), widgetGroupName); setting != nil {
 		clone.WidgetSetting = setting
+		adminContext := admin.Context{Admin: context.Widgets.Config.Admin, Context: &qor.Context{DB: context.DB}}
 
 		var (
-			prefix        = widgetSettingResource.GetAdmin().GetRouter().Prefix
 			widgetObj     = GetWidget(setting.GetSerializableArgumentKind())
 			widgetSetting = widgetObj.Context(clone, setting.GetSerializableArgument(setting))
-			inlineEditURL = fmt.Sprintf("%v/%v/%v/edit?widget_scope=%v", prefix, widgetSettingResource.ToParam(), setting.GetWidgetName(), setting.GetScope())
+			inlineEditURL = adminContext.URLFor(setting, widgetSettingResource)
 		)
 
 		if clone.InlineEdit {
