@@ -334,7 +334,7 @@ func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourc
 		if res.GetMeta("Shared") == nil {
 			res.Meta(&admin.Meta{
 				Name:  "Shared",
-				Label: "This widget is shared",
+				Label: "Make this widget and its contents available for reuse",
 			})
 		}
 
