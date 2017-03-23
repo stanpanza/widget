@@ -122,7 +122,10 @@
 
       INLINE_EDIT_URL = $this.data("widget-inline-edit-url");
 
-      $wrap.css("position", "relative").addClass("qor-widget").unwrap();
+      if ($wrap.css("position") === "static") {
+        $wrap.css("position", "relative");
+      }
+      $wrap.addClass("qor-widget").unwrap();
       $wrap.append('<div class="qor-widget-embed-wrapper"><button style="display: none;" data-url=\"' + $this.data("url") + '\" class="qor-widget-button">Edit</button></div>');
     });
 
