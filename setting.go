@@ -41,30 +41,32 @@ type QorWidgetSetting struct {
 	UpdatedAt time.Time
 }
 
-func (widgetSetting *QorWidgetSetting) ResourceName() string {
+// ResourceName use widget content as resource name
+func (qorWidgetSetting *QorWidgetSetting) ResourceName() string {
 	return "Widget Content"
 }
 
-func (widgetSetting *QorWidgetSetting) BeforeCreate() {
+// BeforeCreate before create callback
+func (qorWidgetSetting *QorWidgetSetting) BeforeCreate() {
 	now := time.Now()
-	widgetSetting.ActivatedAt = &now
+	qorWidgetSetting.ActivatedAt = &now
 }
 
-func (widgetSetting *QorWidgetSetting) BeforeUpdate(scope *gorm.Scope) error {
+func (qorWidgetSetting *QorWidgetSetting) BeforeUpdate(scope *gorm.Scope) error {
 	value := reflect.New(scope.GetModelStruct().ModelType).Interface()
-	return scope.NewDB().Model(value).Where("name = ? AND scope = ?", widgetSetting.Name, widgetSetting.Scope).UpdateColumn("activated_at", gorm.Expr("NULL")).Error
+	return scope.NewDB().Model(value).Where("name = ? AND scope = ?", qorWidgetSetting.Name, qorWidgetSetting.Scope).UpdateColumn("activated_at", gorm.Expr("NULL")).Error
 }
 
-func (widgetSetting *QorWidgetSetting) GetSerializableArgumentKind() string {
-	if widgetSetting.WidgetType != "" {
-		return widgetSetting.WidgetType
+func (qorWidgetSetting *QorWidgetSetting) GetSerializableArgumentKind() string {
+	if qorWidgetSetting.WidgetType != "" {
+		return qorWidgetSetting.WidgetType
 	}
-	return widgetSetting.Kind
+	return qorWidgetSetting.Kind
 }
 
-func (widgetSetting *QorWidgetSetting) SetSerializableArgumentKind(name string) {
-	widgetSetting.WidgetType = name
-	widgetSetting.Kind = name
+func (qorWidgetSetting *QorWidgetSetting) SetSerializableArgumentKind(name string) {
+	qorWidgetSetting.WidgetType = name
+	qorWidgetSetting.Kind = name
 }
 
 // GetWidgetName get widget setting's group name
@@ -261,7 +263,7 @@ func (qorWidgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Reso
 		res.UseTheme("widget")
 
 		res.IndexAttrs("Name", "CreatedAt", "UpdatedAt")
-		res.ShowAttrs("Name", "Scope", "WidgetType", "Template", "Value", "CreatedAt", "UpdatedAt")
+		res.ShowAttrs("Name", "Scope", "WidgetType", "Template", "Value", "CreatedAt", "UpdatedAt", false)
 		res.EditAttrs(
 			"Scope", "ActivatedAt", "Widgets", "Template",
 			&admin.Section{
