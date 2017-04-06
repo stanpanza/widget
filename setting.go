@@ -161,24 +161,16 @@ func (widgetSetting *QorWidgetSetting) GetSerializableArgumentResource() *admin.
 // ConfigureQorResource a method used to config Widget for qor admin
 func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourcer) {
 	if res, ok := res.(*admin.Resource); ok {
-		if res.GetMeta("Name") == nil {
-			res.Meta(&admin.Meta{Name: "Name"})
-		}
-
-		if res.GetMeta("PreviewIcon") == nil {
-			res.Meta(&admin.Meta{Name: "PreviewIcon", Valuer: func(result interface{}, context *qor.Context) interface{} {
-				if setting, ok := result.(QorWidgetSettingInterface); ok {
-					if widget := GetWidget(setting.GetSerializableArgumentKind()); widget != nil {
-						return template.HTML(fmt.Sprintf("<img class='qor-preview-icon' src='%v'/>", widget.PreviewIcon))
-					}
+		res.Meta(&admin.Meta{Name: "PreviewIcon", Valuer: func(result interface{}, context *qor.Context) interface{} {
+			if setting, ok := result.(QorWidgetSettingInterface); ok {
+				if widget := GetWidget(setting.GetSerializableArgumentKind()); widget != nil {
+					return template.HTML(fmt.Sprintf("<img class='qor-preview-icon' src='%v'/>", widget.PreviewIcon))
 				}
-				return ""
-			}})
-		}
+			}
+			return ""
+		}})
 
-		if res.GetMeta("DisplayName") == nil {
-			res.Meta(&admin.Meta{Name: "DisplayName", Label: "Name", Type: "readonly", FieldName: "Name"})
-		}
+		res.Meta(&admin.Meta{Name: "DisplayName", Label: "Name", Type: "readonly", FieldName: "Name"})
 
 		if res.GetMeta("Scope") == nil {
 			res.Meta(&admin.Meta{

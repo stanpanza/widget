@@ -25,7 +25,7 @@ var funcMap = map[string]interface{}{
 
 	OUTER:
 		for _, w := range registeredWidgets {
-			if w.Permission.HasPermission(roles.Create, context.Context.Roles...) {
+			if w.Permission == nil || w.Permission.HasPermission(roles.Create, context.Context.Roles...) {
 				for _, groupedWidgets := range groupedWidgetsSlice {
 					if groupedWidgets.Group == w.Group {
 						groupedWidgets.Widgets = append(groupedWidgets.Widgets, w)

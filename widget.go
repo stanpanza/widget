@@ -103,7 +103,7 @@ type Widget struct {
 	Group       string
 	Templates   []string
 	Setting     *admin.Resource
-	Permission  roles.Permission
+	Permission  *roles.Permission
 	Context     func(context *Context, setting interface{}) *Context
 }
 
