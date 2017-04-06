@@ -3,6 +3,9 @@ package widget
 import (
 	"sort"
 	"strings"
+
+	"github.com/qor/admin"
+	"github.com/qor/roles"
 )
 
 type GroupedWidgets struct {
@@ -17,21 +20,24 @@ var funcMap = map[string]interface{}{
 		}
 		return []*Scope{}
 	},
-	"widget_grouped_widgets": func() []*GroupedWidgets {
+	"widget_grouped_widgets": func(context *admin.Context) []*GroupedWidgets {
 		groupedWidgetsSlice := []*GroupedWidgets{}
 
 	OUTER:
 		for _, w := range registeredWidgets {
-			for _, groupedWidgets := range groupedWidgetsSlice {
-				if groupedWidgets.Group == w.Group {
-					groupedWidgets.Widgets = append(groupedWidgets.Widgets, w)
-					continue OUTER
+			if w.Permission.HasPermission(roles.Create, context.Context.Roles...) {
+				for _, groupedWidgets := range groupedWidgetsSlice {
+					if groupedWidgets.Group == w.Group {
+						groupedWidgets.Widgets = append(groupedWidgets.Widgets, w)
+						continue OUTER
+					}
 				}
+
+				groupedWidgetsSlice = append(groupedWidgetsSlice, &GroupedWidgets{
+					Group:   w.Group,
+					Widgets: []*Widget{w},
+				})
 			}
-			groupedWidgetsSlice = append(groupedWidgetsSlice, &GroupedWidgets{
-				Group:   w.Group,
-				Widgets: []*Widget{w},
-			})
 		}
 
 		sort.SliceStable(groupedWidgetsSlice, func(i, j int) bool {

@@ -9,6 +9,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"
 	"github.com/qor/qor/resource"
+	"github.com/qor/roles"
 )
 
 var (
@@ -102,6 +103,7 @@ type Widget struct {
 	Group       string
 	Templates   []string
 	Setting     *admin.Resource
+	Permission  roles.Permission
 	Context     func(context *Context, setting interface{}) *Context
 }
 
