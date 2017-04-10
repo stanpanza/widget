@@ -172,163 +172,151 @@ func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourc
 
 		res.Meta(&admin.Meta{Name: "DisplayName", Label: "Name", Type: "readonly", FieldName: "Name"})
 
-		if res.GetMeta("Scope") == nil {
-			res.Meta(&admin.Meta{
-				Name: "Scope",
-				Type: "hidden",
-				Valuer: func(result interface{}, context *qor.Context) interface{} {
-					if scope := context.Request.URL.Query().Get("widget_scope"); scope != "" {
+		res.Meta(&admin.Meta{
+			Name: "Scope",
+			Type: "hidden",
+			Valuer: func(result interface{}, context *qor.Context) interface{} {
+				if scope := context.Request.URL.Query().Get("widget_scope"); scope != "" {
+					return scope
+				}
+
+				if setting, ok := result.(QorWidgetSettingInterface); ok {
+					if scope := setting.GetScope(); scope != "" {
 						return scope
 					}
+				}
 
-					if setting, ok := result.(QorWidgetSettingInterface); ok {
-						if scope := setting.GetScope(); scope != "" {
-							return scope
-						}
-					}
+				return "default"
+			},
+			Setter: func(result interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+				if setting, ok := result.(QorWidgetSettingInterface); ok {
+					setting.SetScope(utils.ToString(metaValue.Value))
+				}
+			},
+		})
 
-					return "default"
-				},
-				Setter: func(result interface{}, metaValue *resource.MetaValue, context *qor.Context) {
-					if setting, ok := result.(QorWidgetSettingInterface); ok {
-						setting.SetScope(utils.ToString(metaValue.Value))
-					}
-				},
-			})
-		}
+		res.Meta(&admin.Meta{
+			Name: "SourceType",
+			Type: "hidden",
+			Valuer: func(result interface{}, context *qor.Context) interface{} {
+				if sourceType := context.Request.URL.Query().Get("widget_source_type"); sourceType != "" {
+					return sourceType
+				}
 
-		if res.GetMeta("SourceType") == nil {
-			res.Meta(&admin.Meta{
-				Name: "SourceType",
-				Type: "hidden",
-				Valuer: func(result interface{}, context *qor.Context) interface{} {
-					if sourceType := context.Request.URL.Query().Get("widget_source_type"); sourceType != "" {
+				if setting, ok := result.(QorWidgetSettingInterface); ok {
+					if sourceType := setting.GetSourceType(); sourceType != "" {
 						return sourceType
 					}
+				}
+				return ""
+			},
+			Setter: func(result interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+				if setting, ok := result.(QorWidgetSettingInterface); ok {
+					setting.SetSourceType(utils.ToString(metaValue.Value))
+				}
+			},
+		})
 
-					if setting, ok := result.(QorWidgetSettingInterface); ok {
-						if sourceType := setting.GetSourceType(); sourceType != "" {
-							return sourceType
-						}
-					}
-					return ""
-				},
-				Setter: func(result interface{}, metaValue *resource.MetaValue, context *qor.Context) {
-					if setting, ok := result.(QorWidgetSettingInterface); ok {
-						setting.SetSourceType(utils.ToString(metaValue.Value))
-					}
-				},
-			})
-		}
+		res.Meta(&admin.Meta{
+			Name: "SourceID",
+			Type: "hidden",
+			Valuer: func(result interface{}, context *qor.Context) interface{} {
+				if sourceID := context.Request.URL.Query().Get("widget_source_id"); sourceID != "" {
+					return sourceID
+				}
 
-		if res.GetMeta("SourceID") == nil {
-			res.Meta(&admin.Meta{
-				Name: "SourceID",
-				Type: "hidden",
-				Valuer: func(result interface{}, context *qor.Context) interface{} {
-					if sourceID := context.Request.URL.Query().Get("widget_source_id"); sourceID != "" {
+				if setting, ok := result.(QorWidgetSettingInterface); ok {
+					if sourceID := setting.GetSourceID(); sourceID != "" {
 						return sourceID
 					}
+				}
+				return ""
+			},
+			Setter: func(result interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+				if setting, ok := result.(QorWidgetSettingInterface); ok {
+					setting.SetSourceID(utils.ToString(metaValue.Value))
+				}
+			},
+		})
 
-					if setting, ok := result.(QorWidgetSettingInterface); ok {
-						if sourceID := setting.GetSourceID(); sourceID != "" {
-							return sourceID
+		res.Meta(&admin.Meta{
+			Name: "Widgets",
+			Type: "select_one",
+			Valuer: func(result interface{}, context *qor.Context) interface{} {
+				if typ := context.Request.URL.Query().Get("widget_type"); typ != "" {
+					return typ
+				}
+
+				if setting, ok := result.(QorWidgetSettingInterface); ok {
+					widget := GetWidget(setting.GetSerializableArgumentKind())
+					if widget == nil {
+						return ""
+					}
+					return widget.Name
+				}
+
+				return ""
+			},
+			Collection: func(result interface{}, context *qor.Context) (results [][]string) {
+				if setting, ok := result.(QorWidgetSettingInterface); ok {
+					if setting.GetWidgetName() == "" {
+						for _, widget := range registeredWidgets {
+							results = append(results, []string{widget.Name, widget.Name})
 						}
-					}
-					return ""
-				},
-				Setter: func(result interface{}, metaValue *resource.MetaValue, context *qor.Context) {
-					if setting, ok := result.(QorWidgetSettingInterface); ok {
-						setting.SetSourceID(utils.ToString(metaValue.Value))
-					}
-				},
-			})
-		}
-
-		if res.GetMeta("Widgets") == nil {
-			res.Meta(&admin.Meta{
-				Name: "Widgets",
-				Type: "select_one",
-				Valuer: func(result interface{}, context *qor.Context) interface{} {
-					if typ := context.Request.URL.Query().Get("widget_type"); typ != "" {
-						return typ
-					}
-
-					if setting, ok := result.(QorWidgetSettingInterface); ok {
-						widget := GetWidget(setting.GetSerializableArgumentKind())
-						if widget == nil {
-							return ""
-						}
-						return widget.Name
-					}
-
-					return ""
-				},
-				Collection: func(result interface{}, context *qor.Context) (results [][]string) {
-					if setting, ok := result.(QorWidgetSettingInterface); ok {
-						if setting.GetWidgetName() == "" {
-							for _, widget := range registeredWidgets {
-								results = append(results, []string{widget.Name, widget.Name})
-							}
-						} else {
-							groupName := setting.GetGroupName()
-							for _, group := range registeredWidgetsGroup {
-								if group.Name == groupName {
-									for _, widget := range group.Widgets {
-										results = append(results, []string{widget, widget})
-									}
+					} else {
+						groupName := setting.GetGroupName()
+						for _, group := range registeredWidgetsGroup {
+							if group.Name == groupName {
+								for _, widget := range group.Widgets {
+									results = append(results, []string{widget, widget})
 								}
 							}
 						}
+					}
 
-						if len(results) == 0 {
-							results = append(results, []string{setting.GetSerializableArgumentKind(), setting.GetSerializableArgumentKind()})
+					if len(results) == 0 {
+						results = append(results, []string{setting.GetSerializableArgumentKind(), setting.GetSerializableArgumentKind()})
+					}
+				}
+				return
+			},
+			Setter: func(result interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+				if setting, ok := result.(QorWidgetSettingInterface); ok {
+					setting.SetSerializableArgumentKind(utils.ToString(metaValue.Value))
+				}
+			},
+		})
+
+		res.Meta(&admin.Meta{
+			Name: "Template",
+			Type: "select_one",
+			Valuer: func(result interface{}, context *qor.Context) interface{} {
+				if setting, ok := result.(QorWidgetSettingInterface); ok {
+					return setting.GetTemplate()
+				}
+				return ""
+			},
+			Collection: func(result interface{}, context *qor.Context) (results [][]string) {
+				if setting, ok := result.(QorWidgetSettingInterface); ok {
+					if widget := GetWidget(setting.GetSerializableArgumentKind()); widget != nil {
+						for _, value := range widget.Templates {
+							results = append(results, []string{value, value})
 						}
 					}
-					return
-				},
-				Setter: func(result interface{}, metaValue *resource.MetaValue, context *qor.Context) {
-					if setting, ok := result.(QorWidgetSettingInterface); ok {
-						setting.SetSerializableArgumentKind(utils.ToString(metaValue.Value))
-					}
-				},
-			})
-		}
+				}
+				return
+			},
+			Setter: func(result interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+				if setting, ok := result.(QorWidgetSettingInterface); ok {
+					setting.SetTemplate(utils.ToString(metaValue.Value))
+				}
+			},
+		})
 
-		if res.GetMeta("Template") == nil {
-			res.Meta(&admin.Meta{
-				Name: "Template",
-				Type: "select_one",
-				Valuer: func(result interface{}, context *qor.Context) interface{} {
-					if setting, ok := result.(QorWidgetSettingInterface); ok {
-						return setting.GetTemplate()
-					}
-					return ""
-				},
-				Collection: func(result interface{}, context *qor.Context) (results [][]string) {
-					if setting, ok := result.(QorWidgetSettingInterface); ok {
-						if widget := GetWidget(setting.GetSerializableArgumentKind()); widget != nil {
-							for _, value := range widget.Templates {
-								results = append(results, []string{value, value})
-							}
-						}
-					}
-					return
-				},
-				Setter: func(result interface{}, metaValue *resource.MetaValue, context *qor.Context) {
-					if setting, ok := result.(QorWidgetSettingInterface); ok {
-						setting.SetTemplate(utils.ToString(metaValue.Value))
-					}
-				},
-			})
-		}
-
-		if res.GetMeta("Shared") == nil {
-			res.Meta(&admin.Meta{
-				Name:  "Shared",
-				Label: "Make this widget and its contents available for reuse",
-			})
-		}
+		res.Meta(&admin.Meta{
+			Name:  "Shared",
+			Label: "Make this widget and its contents available for reuse",
+		})
 
 		res.Scope(&admin.Scope{
 			Name:  "Shared",
