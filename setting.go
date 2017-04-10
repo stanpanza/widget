@@ -170,9 +170,9 @@ func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourc
 			return ""
 		}})
 
-		res.Meta(&admin.Meta{Name: "Name", Label: "Name", Type: "string", FieldName: "Name"})
-
+		res.Meta(&admin.Meta{Name: "Name", Type: "string"})
 		res.Meta(&admin.Meta{Name: "DisplayName", Label: "Name", Type: "readonly", FieldName: "Name"})
+		res.Meta(&admin.Meta{Name: "Description", Type: "string"})
 
 		res.Meta(&admin.Meta{
 			Name: "Scope",
