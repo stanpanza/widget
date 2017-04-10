@@ -116,7 +116,7 @@ func (wc widgetController) getWidget(context *admin.Context) (interface{}, []str
 	var DB = context.GetDB()
 
 	// index page
-	if context.ResourceID == "" {
+	if context.ResourceID == "" && context.Request.Method == "GET" {
 		scope := context.Request.URL.Query().Get("widget_scope")
 		if scope == "" {
 			scope = "default"

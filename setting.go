@@ -170,6 +170,8 @@ func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourc
 			return ""
 		}})
 
+		res.Meta(&admin.Meta{Name: "Name", Label: "Name", Type: "string", FieldName: "Name"})
+
 		res.Meta(&admin.Meta{Name: "DisplayName", Label: "Name", Type: "readonly", FieldName: "Name"})
 
 		res.Meta(&admin.Meta{
@@ -347,7 +349,7 @@ func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourc
 		res.UseTheme("widget")
 
 		res.IndexAttrs("PreviewIcon", "Name", "Description", "CreatedAt", "UpdatedAt")
-		res.ShowAttrs("PreviewIcon", "Name", "Scope", "WidgetType", "Template", "Description", "Value", "CreatedAt", "UpdatedAt")
+		res.ShowAttrs("PreviewIcon", "Name", "Scope", "WidgetType", "Template", "Description", "Value", "CreatedAt", "UpdatedAt", false)
 		res.EditAttrs(
 			"DisplayName", "Description", "Scope", "Widgets", "Template",
 			&admin.Section{
