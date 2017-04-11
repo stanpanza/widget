@@ -118,7 +118,7 @@ func (context *Context) findWidgetSetting(widgetName string, scopes []string, wi
 	if context.SourceID != "" {
 		db.Order("source_id DESC").Where("name = ? AND scope IN (?) AND ((shared = ? AND source_type = ?) OR (source_type = ? AND source_id = ?))", widgetName, scopes, true, "", context.SourceType, context.SourceID).Find(settings)
 	} else {
-		db.Debug().Where("name = ? AND scope IN (?) AND source_type = ?", widgetName, scopes, "").Find(settings)
+		db.Where("name = ? AND scope IN (?) AND source_type = ?", widgetName, scopes, "").Find(settings)
 	}
 
 	settingsValue := reflect.Indirect(reflect.ValueOf(settings))
