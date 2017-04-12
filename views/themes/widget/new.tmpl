@@ -16,13 +16,15 @@
 
       <div class="qor-layout__widget qor-layout__widget-new" data-toggle="qor.widget">
         <ul class="qor-slideout__lists">
-          {{range $groupWidget := widget_grouped_widgets $context}}
+          {{$groupWidgets := widget_grouped_widgets $context}}
+          {{range $groupWidget := $groupWidgets}}
             <li>
               {{if $groupWidget.Group}}
                 <h5 class="qor-slideout__lists-groupname">{{t (printf "qor_widgets.group.%v" $groupWidget.Group) $groupWidget.Group}}</h5>
-              {{else}}
-                <br>
+              {{else if (gt (len $groupWidgets) 1)}}
+                <h5 class="qor-slideout__lists-groupname">{{t "qor_widgets.group.other" "Other"}}</h5>
               {{end}}
+
               <div class="qor-slideout__lists-item">
                 {{range $widget := $groupWidget.Widgets}}
                   <a href="{{patch_url (join_url (url_for $resource) "!setting") "widget_type" $widget.Name}}" data-widget-type="{{$widget.Name}}" class="qor-widget__new">

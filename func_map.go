@@ -41,7 +41,10 @@ var funcMap = map[string]interface{}{
 		}
 
 		sort.SliceStable(groupedWidgetsSlice, func(i, j int) bool {
-			return strings.Compare(groupedWidgetsSlice[i].Group, groupedWidgetsSlice[j].Group) > 0
+			if groupedWidgetsSlice[i].Group == "" {
+				return false
+			}
+			return strings.Compare(groupedWidgetsSlice[i].Group, groupedWidgetsSlice[j].Group) < 0
 		})
 
 		return groupedWidgetsSlice
