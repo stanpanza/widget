@@ -368,7 +368,10 @@ func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourc
 
 		searchHandler := res.SearchHandler
 		res.SearchHandler = func(keyword string, context *qor.Context) *gorm.DB {
-			context.SetDB(context.GetDB().Where("source_type = ?", ""))
+			// don't include widgets have source_type in index page
+			if context.ResourceID == "" {
+				context.SetDB(context.GetDB().Where("source_type = ?", ""))
+			}
 			return searchHandler(keyword, context)
 		}
 	}
