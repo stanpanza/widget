@@ -320,14 +320,6 @@ func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourc
 			Label: "Make this widget and its contents available for reuse",
 		})
 
-		res.Scope(&admin.Scope{
-			Name:  "Shared",
-			Label: "Shared Widgets",
-			Handle: func(db *gorm.DB, _ *qor.Context) *gorm.DB {
-				return db.Where("shared = ?", true)
-			},
-		})
-
 		res.Action(&admin.Action{
 			Name: "Preview",
 			URL: func(record interface{}, context *admin.Context) string {
