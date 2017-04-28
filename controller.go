@@ -104,7 +104,11 @@ func (wc widgetController) Update(context *admin.Context) {
 			"get_widget_scopes": func() []string { return scopes },
 		}).Execute("edit", widgetSetting)
 	} else {
-		http.Redirect(context.Writer, context.Request, context.Request.URL.Path, http.StatusFound)
+		responder.With("html", func() {
+			http.Redirect(context.Writer, context.Request, context.Request.URL.Path, http.StatusFound)
+		}).With("json", func() {
+			context.JSON("index", widgetSetting)
+		}).Respond(context.Request)
 	}
 }
 
