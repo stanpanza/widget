@@ -3,9 +3,7 @@ package widget
 import (
 	"html/template"
 	"net/http"
-	"reflect"
 
-	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"
 	"github.com/qor/responder"
 	"github.com/qor/serializable_meta"
@@ -106,7 +104,11 @@ func (wc widgetController) Update(context *admin.Context) {
 			"get_widget_scopes": func() []string { return scopes },
 		}).Execute("edit", widgetSetting)
 	} else {
-		http.Redirect(context.Writer, context.Request, context.Request.URL.Path, http.StatusFound)
+		responder.With("html", func() {
+			http.Redirect(context.Writer, context.Request, context.Request.URL.Path, http.StatusFound)
+		}).With("json", func() {
+			context.JSON("index", widgetSetting)
+		}).Respond(context.Request)
 	}
 }
 
@@ -115,64 +117,41 @@ func (wc widgetController) InlineEdit(context *admin.Context) {
 }
 
 func (wc widgetController) getWidget(context *admin.Context) (interface{}, []string, error) {
-	if context.ResourceID == "" {
+	var DB = context.GetDB()
+
+	// index page
+	if context.ResourceID == "" && context.Request.Method == "GET" {
 		scope := context.Request.URL.Query().Get("widget_scope")
 		if scope == "" {
 			scope = "default"
 		}
 
-		// index page
-		context.SetDB(context.GetDB().Where("scope = ? AND activated_at IS NOT NULL", scope).Order("activated_at DESC"))
+		context.SetDB(DB.Where("scope = ?", scope))
+		defer context.SetDB(DB)
 		results, err := context.FindMany()
 		return results, []string{}, err
 	}
 
 	// show page
 	var (
-		widgetSettings  = wc.Widgets.WidgetSettingResource.NewSlice()
-		selectedSetting *QorWidgetSetting
-		scopes          []string
-		result          = wc.Widgets.WidgetSettingResource.NewStruct()
-		scope           = context.Request.URL.Query().Get("widget_scope")
-		widgetType      = context.Request.URL.Query().Get("widget_type")
-		DB              = context.GetDB()
+		scopes     []string
+		result     = wc.Widgets.WidgetSettingResource.NewStruct()
+		scope      = context.Request.URL.Query().Get("widget_scope")
+		widgetType = context.Request.URL.Query().Get("widget_type")
 	)
 
 	if scope == "" {
 		scope = context.Request.Form.Get("QorResource.Scope")
+		if scope == "" {
+			scope = "default"
+		}
 	}
 
 	if widgetType == "" {
 		widgetType = context.Request.Form.Get("QorResource.Kind")
 	}
 
-	// disable composite primary key mode when specfied scope or widget type
-	if scope != "" || widgetType != "" {
-		DB = DB.Set(admin.DisableCompositePrimaryKeyMode, "on")
-	}
-
-	if scope == "" {
-		scope = "default"
-	}
-
-	DB.Model(result).Where("name = ?", context.ResourceID).Order(gorm.Expr("scope = ?, activated_at IS NULL", "default")).Find(widgetSettings)
-
-	widgetSettingsValues := reflect.Indirect(reflect.ValueOf(widgetSettings))
-	for i := 0; i < widgetSettingsValues.Len(); i++ {
-		setting := widgetSettingsValues.Index(i).Interface().(QorWidgetSettingInterface)
-		if widgetType == "" || setting.GetSerializableArgumentKind() == widgetType {
-			selectedSetting = &QorWidgetSetting{Name: context.ResourceID, Scope: setting.GetScope(), WidgetType: widgetType}
-			if setting.GetScope() == scope {
-				break
-			}
-		}
-	}
-
-	if selectedSetting == nil {
-		selectedSetting = &QorWidgetSetting{Name: context.ResourceID, Scope: "default"}
-	}
-
-	err := DB.Order("activated_at IS NULL").FirstOrInit(result, selectedSetting).Error
+	err := DB.FirstOrInit(result, QorWidgetSetting{Name: context.ResourceID, Scope: scope}).Error
 
 	if widgetType != "" {
 		if serializableMeta, ok := result.(serializable_meta.SerializableMetaInterface); ok && serializableMeta.GetSerializableArgumentKind() != widgetType {

@@ -6,6 +6,8 @@ import (
 	"reflect"
 
 	"github.com/jinzhu/gorm"
+	"github.com/qor/admin"
+	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
 )
 
@@ -16,6 +18,8 @@ type Context struct {
 	AvailableWidgets []string
 	Options          map[string]interface{}
 	InlineEdit       bool
+	SourceType       string
+	SourceID         string
 	FuncMaps         template.FuncMap
 	WidgetSetting    QorWidgetSettingInterface
 }
@@ -45,6 +49,7 @@ func (context *Context) GetDB() *gorm.DB {
 	return context.Widgets.Config.DB
 }
 
+// Clone clone a context
 func (context *Context) Clone() *Context {
 	return &Context{
 		Widgets:          context.Widgets,
@@ -74,12 +79,12 @@ func (context *Context) Render(widgetName string, widgetGroupName string) templa
 
 	if setting := context.findWidgetSetting(widgetName, append(visibleScopes, "default"), widgetGroupName); setting != nil {
 		clone.WidgetSetting = setting
+		adminContext := admin.Context{Admin: context.Widgets.Config.Admin, Context: &qor.Context{DB: context.DB}}
 
 		var (
-			prefix        = widgetSettingResource.GetAdmin().GetRouter().Prefix
 			widgetObj     = GetWidget(setting.GetSerializableArgumentKind())
 			widgetSetting = widgetObj.Context(clone, setting.GetSerializableArgument(setting))
-			inlineEditURL = fmt.Sprintf("%v/%v/%v/edit?widget_scope=%v", prefix, widgetSettingResource.ToParam(), setting.GetWidgetName(), setting.GetScope())
+			inlineEditURL = adminContext.URLFor(setting, widgetSettingResource)
 		)
 
 		if clone.InlineEdit {
@@ -110,7 +115,11 @@ func (context *Context) findWidgetSetting(widgetName string, scopes []string, wi
 		settings              = widgetSettingResource.NewSlice()
 	)
 
-	db.Where("name = ? AND scope IN (?)", widgetName, scopes).Order("activated_at DESC").Find(settings)
+	if context.SourceID != "" {
+		db.Order("source_id DESC").Where("name = ? AND scope IN (?) AND ((shared = ? AND source_type = ?) OR (source_type = ? AND source_id = ?))", widgetName, scopes, true, "", context.SourceType, context.SourceID).Find(settings)
+	} else {
+		db.Where("name = ? AND scope IN (?) AND source_type = ?", widgetName, scopes, "").Find(settings)
+	}
 
 	settingsValue := reflect.Indirect(reflect.ValueOf(settings))
 	if settingsValue.Len() > 0 {
@@ -126,19 +135,21 @@ func (context *Context) findWidgetSetting(widgetName string, scopes []string, wi
 		}
 	}
 
-	if setting == nil {
-		if widgetGroupName == "" {
-			utils.ExitWithMsg("Widget: Can't Create Widget Without Widget Type")
-			return nil
+	if context.SourceType == "" {
+		if setting == nil {
+			if widgetGroupName == "" {
+				utils.ExitWithMsg("Widget: Can't Create Widget Without Widget Type")
+				return nil
+			}
+			setting = widgetSettingResource.NewStruct().(QorWidgetSettingInterface)
+			setting.SetWidgetName(widgetName)
+			setting.SetGroupName(widgetGroupName)
+			setting.SetSerializableArgumentKind(widgetGroupName)
+			db.Create(setting)
+		} else if setting.GetGroupName() != widgetGroupName {
+			setting.SetGroupName(widgetGroupName)
+			db.Save(setting)
 		}
-		setting = widgetSettingResource.NewStruct().(QorWidgetSettingInterface)
-		setting.SetWidgetName(widgetName)
-		setting.SetGroupName(widgetGroupName)
-		setting.SetSerializableArgumentKind(widgetGroupName)
-		db.Create(setting)
-	} else if setting.GetGroupName() != widgetGroupName {
-		setting.SetGroupName(widgetGroupName)
-		db.Save(setting)
 	}
 
 	return setting

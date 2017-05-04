@@ -9,6 +9,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"
 	"github.com/qor/qor/resource"
+	"github.com/qor/roles"
 )
 
 var (
@@ -52,17 +53,17 @@ func (widgets *Widgets) RegisterWidget(w *Widget) {
 	registeredWidgets = append(registeredWidgets, w)
 }
 
-// RegisterWidgetGroup register widgets group
+// RegisterWidgetsGroup register widgets group
 func (widgets *Widgets) RegisterWidgetsGroup(group *WidgetsGroup) {
 	registeredWidgetsGroup = append(registeredWidgetsGroup, group)
 }
 
-// // RegisterFuncMap register view funcs, it could be used when render templates
+// RegisterFuncMap register view funcs, it could be used when render templates
 func (widgets *Widgets) RegisterFuncMap(name string, fc interface{}) {
 	widgets.funcMaps[name] = fc
 }
 
-// ConfigureQorResource a method used to config Widget for qor admin
+// ConfigureQorResourceBeforeInitialize a method used to config Widget for qor admin
 func (widgets *Widgets) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 	if res, ok := res.(*admin.Resource); ok {
 		// register view paths
@@ -70,12 +71,13 @@ func (widgets *Widgets) ConfigureQorResourceBeforeInitialize(res resource.Resour
 
 		// set resources
 		widgets.Resource = res
-		res.Config.Invisible = true
 
 		// set setting resource
 		if widgets.WidgetSettingResource == nil {
-			widgets.WidgetSettingResource = res.GetAdmin().AddResource(&QorWidgetSetting{}, &admin.Config{Name: res.Name})
+			widgets.WidgetSettingResource = res.GetAdmin().NewResource(&QorWidgetSetting{}, &admin.Config{Name: res.Name})
 		}
+
+		res.Name = widgets.WidgetSettingResource.Name
 
 		for funcName, fc := range funcMap {
 			res.GetAdmin().RegisterFuncMap(funcName, fc)
@@ -84,23 +86,27 @@ func (widgets *Widgets) ConfigureQorResourceBeforeInitialize(res resource.Resour
 		// configure routes
 		controller := widgetController{Widgets: widgets}
 		router := res.GetAdmin().GetRouter()
-		router.Get(widgets.WidgetSettingResource.ToParam(), controller.Index)
-		router.Get(fmt.Sprintf("%v/new", widgets.WidgetSettingResource.ToParam()), controller.New)
-		router.Get(fmt.Sprintf("%v/!setting", widgets.WidgetSettingResource.ToParam()), controller.Setting)
-		router.Get(fmt.Sprintf("%v/%v", widgets.WidgetSettingResource.ToParam(), widgets.WidgetSettingResource.ParamIDName()), controller.Edit)
-		router.Get(fmt.Sprintf("%v/%v/!preview", widgets.WidgetSettingResource.ToParam(), widgets.WidgetSettingResource.ParamIDName()), controller.Preview)
-		router.Get(fmt.Sprintf("%v/%v/edit", widgets.WidgetSettingResource.ToParam(), widgets.WidgetSettingResource.ParamIDName()), controller.Edit)
-		router.Put(fmt.Sprintf("%v/%v", widgets.WidgetSettingResource.ToParam(), widgets.WidgetSettingResource.ParamIDName()), controller.Update)
-		router.Get(fmt.Sprintf("%v/inline-edit", res.ToParam()), controller.InlineEdit)
+		router.Get(widgets.WidgetSettingResource.ToParam(), controller.Index, &admin.RouteConfig{Resource: widgets.WidgetSettingResource})
+		router.Get(fmt.Sprintf("%v/new", widgets.WidgetSettingResource.ToParam()), controller.New, &admin.RouteConfig{Resource: widgets.WidgetSettingResource})
+		router.Get(fmt.Sprintf("%v/!setting", widgets.WidgetSettingResource.ToParam()), controller.Setting, &admin.RouteConfig{Resource: widgets.WidgetSettingResource})
+		router.Get(fmt.Sprintf("%v/%v", widgets.WidgetSettingResource.ToParam(), widgets.WidgetSettingResource.ParamIDName()), controller.Edit, &admin.RouteConfig{Resource: widgets.WidgetSettingResource})
+		router.Get(fmt.Sprintf("%v/%v/!preview", widgets.WidgetSettingResource.ToParam(), widgets.WidgetSettingResource.ParamIDName()), controller.Preview, &admin.RouteConfig{Resource: widgets.WidgetSettingResource})
+		router.Get(fmt.Sprintf("%v/%v/edit", widgets.WidgetSettingResource.ToParam(), widgets.WidgetSettingResource.ParamIDName()), controller.Edit, &admin.RouteConfig{Resource: widgets.WidgetSettingResource})
+		router.Put(fmt.Sprintf("%v/%v", widgets.WidgetSettingResource.ToParam(), widgets.WidgetSettingResource.ParamIDName()), controller.Update, &admin.RouteConfig{Resource: widgets.WidgetSettingResource})
+		router.Post(widgets.WidgetSettingResource.ToParam(), controller.Update, &admin.RouteConfig{Resource: widgets.WidgetSettingResource})
+		router.Get(fmt.Sprintf("%v/inline-edit", res.ToParam()), controller.InlineEdit, &admin.RouteConfig{Resource: widgets.WidgetSettingResource})
 	}
 }
 
 // Widget widget struct
 type Widget struct {
-	Name      string
-	Templates []string
-	Setting   *admin.Resource
-	Context   func(context *Context, setting interface{}) *Context
+	Name        string
+	PreviewIcon string
+	Group       string
+	Templates   []string
+	Setting     *admin.Resource
+	Permission  *roles.Permission
+	Context     func(context *Context, setting interface{}) *Context
 }
 
 // WidgetsGroup widgets Group
