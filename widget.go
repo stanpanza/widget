@@ -58,8 +58,6 @@ func (widgets *Widgets) SetAssetFS(assetFS admin.AssetFSInterface) {
 		assetFS.RegisterPath(viewPath)
 	}
 
-	assetFS.Compile()
-
 	widgets.AssetFileSystem = assetFS
 }
 
