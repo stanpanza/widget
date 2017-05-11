@@ -2,7 +2,6 @@ package widget
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"html/template"
 	"os"
@@ -79,7 +78,6 @@ func (context *Context) FuncMap() template.FuncMap {
 // Render register widget itself content
 func (w *Widget) Render(context *Context, file string) template.HTML {
 	var err error
-	var result = bytes.NewBufferString("")
 	if file == "" {
 		file = w.Templates[0]
 	}
@@ -91,8 +89,9 @@ func (w *Widget) Render(context *Context, file string) template.HTML {
 		}
 	}()
 
-	if file, err = w.findTemplate(file + ".tmpl"); err == nil {
-		if tmpl, err := template.New(filepath.Base(file)).Funcs(context.FuncMaps).ParseFiles(file); err == nil {
+	if content, err := context.Widgets.AssetFileSystem.Asset(file + ".tmpl"); err == nil {
+		if tmpl, err := template.New(filepath.Base(file)).Funcs(context.FuncMaps).Parse(string(content)); err == nil {
+			var result = bytes.NewBufferString("")
 			if err = tmpl.Execute(result, context.Options); err == nil {
 				return template.HTML(result.String())
 			}
@@ -105,10 +104,10 @@ func (w *Widget) Render(context *Context, file string) template.HTML {
 // RegisterViewPath register views directory
 func (widgets *Widgets) RegisterViewPath(p string) {
 	for _, gopath := range strings.Split(os.Getenv("GOPATH"), ":") {
-		if registerViewPath(path.Join(gopath, "src", p)) == nil {
-			return
-		}
+		widgets.AssetFileSystem.RegisterPath(path.Join(gopath, "src", p))
 	}
+
+	widgets.AssetFileSystem.Compile()
 }
 
 // LoadPreviewAssets will return assets tag used for Preview
@@ -125,42 +124,4 @@ func (widgets *Widgets) LoadPreviewAssets() template.HTML {
 		}
 	}
 	return template.HTML(tags)
-}
-
-func isExistingDir(pth string) bool {
-	fi, err := os.Stat(pth)
-	if err != nil {
-		return false
-	}
-	return fi.Mode().IsDir()
-}
-
-func registerViewPath(path string) error {
-	if isExistingDir(path) {
-		var found bool
-
-		for _, viewPath := range viewPaths {
-			if path == viewPath {
-				found = true
-				break
-			}
-		}
-
-		if !found {
-			viewPaths = append(viewPaths, path)
-		}
-		return nil
-	}
-	return errors.New("path not found")
-}
-
-func (w *Widget) findTemplate(layouts ...string) (string, error) {
-	for _, layout := range layouts {
-		for _, p := range viewPaths {
-			if _, err := os.Stat(filepath.Join(p, layout)); !os.IsNotExist(err) {
-				return filepath.Join(p, layout), nil
-			}
-		}
-	}
-	return "", fmt.Errorf("template not found: %v", layouts)
 }

@@ -30,12 +30,15 @@ func init() {
 	if path := os.Getenv("WEB_ROOT"); path != "" {
 		root = path
 	}
-	registerViewPath(path.Join(root, "app/views/widgets"))
 }
 
 // New new widgets container
 func New(config *Config) *Widgets {
-	widgets := &Widgets{Config: config, funcMaps: template.FuncMap{}}
+	widgets := &Widgets{Config: config, funcMaps: template.FuncMap{}, AssetFileSystem: &admin.AssetFileSystem{}}
+
+	if root != "" {
+		widgets.RegisterViewPath(path.Join(root, "app/views/widgets"))
+	}
 	widgets.RegisterViewPath("app/views/widgets")
 	return widgets
 }
@@ -45,7 +48,19 @@ type Widgets struct {
 	funcMaps              template.FuncMap
 	Config                *Config
 	Resource              *admin.Resource
+	AssetFileSystem       admin.AssetFSInterface
 	WidgetSettingResource *admin.Resource
+}
+
+// SetAssetFS set asset fs for render
+func (widgets *Widgets) SetAssetFS(assetFS admin.AssetFSInterface) {
+	for _, viewPath := range viewPaths {
+		assetFS.RegisterPath(viewPath)
+	}
+
+	assetFS.Compile()
+
+	widgets.AssetFileSystem = assetFS
 }
 
 // RegisterWidget register a new widget
