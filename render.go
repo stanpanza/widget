@@ -77,7 +77,12 @@ func (context *Context) FuncMap() template.FuncMap {
 
 // Render register widget itself content
 func (w *Widget) Render(context *Context, file string) template.HTML {
-	var err error
+	var (
+		err     error
+		content []byte
+		tmpl    *template.Template
+	)
+
 	if file == "" {
 		file = w.Templates[0]
 	}
@@ -89,8 +94,8 @@ func (w *Widget) Render(context *Context, file string) template.HTML {
 		}
 	}()
 
-	if content, err := context.Widgets.AssetFileSystem.Asset(file + ".tmpl"); err == nil {
-		if tmpl, err := template.New(filepath.Base(file)).Funcs(context.FuncMaps).Parse(string(content)); err == nil {
+	if content, err = context.Widgets.AssetFileSystem.Asset(file + ".tmpl"); err == nil {
+		if tmpl, err = template.New(filepath.Base(file)).Funcs(context.FuncMaps).Parse(string(content)); err == nil {
 			var result = bytes.NewBufferString("")
 			if err = tmpl.Execute(result, context.Options); err == nil {
 				return template.HTML(result.String())
