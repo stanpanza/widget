@@ -108,11 +108,15 @@ func (w *Widget) Render(context *Context, file string) template.HTML {
 
 // RegisterViewPath register views directory
 func (widgets *Widgets) RegisterViewPath(p string) {
-	for _, gopath := range strings.Split(os.Getenv("GOPATH"), ":") {
-		widgets.AssetFileSystem.RegisterPath(path.Join(gopath, "src", p))
+	if filepath.IsAbs(p) {
+		viewPaths = append(viewPaths, p)
+		widgets.AssetFileSystem.RegisterPath(p)
+	} else {
+		for _, gopath := range strings.Split(os.Getenv("GOPATH"), ":") {
+			viewPaths = append(viewPaths, path.Join(gopath, "src", p))
+			widgets.AssetFileSystem.RegisterPath(path.Join(gopath, "src", p))
+		}
 	}
-
-	widgets.AssetFileSystem.Compile()
 }
 
 // LoadPreviewAssets will return assets tag used for Preview
