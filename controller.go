@@ -99,10 +99,15 @@ func (wc widgetController) Update(context *admin.Context) {
 	}
 
 	if context.HasError() {
-		context.Writer.WriteHeader(admin.HTTPUnprocessableEntity)
-		context.Funcs(template.FuncMap{
-			"get_widget_scopes": func() []string { return scopes },
-		}).Execute("edit", widgetSetting)
+		responder.With("html", func() {
+			context.Writer.WriteHeader(admin.HTTPUnprocessableEntity)
+			context.Funcs(template.FuncMap{
+				"get_widget_scopes": func() []string { return scopes },
+			}).Execute("edit", widgetSetting)
+		}).With([]string{"json", "xml"}, func() {
+			context.Writer.WriteHeader(admin.HTTPUnprocessableEntity)
+			context.Encode("index", map[string]interface{}{"errors": context.GetErrors()})
+		}).Respond(context.Request)
 	} else {
 		responder.With("html", func() {
 			http.Redirect(context.Writer, context.Request, context.Request.URL.Path, http.StatusFound)
