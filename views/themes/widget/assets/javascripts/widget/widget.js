@@ -182,6 +182,9 @@
         cancelForm: function () {
             let $element = this.$element;
 
+            if ($element.closest('.qor-bottomsheets').length) {
+                $element.closest('.qor-bottomsheets').removeClass('qor-bottomsheets__fullscreen');
+            }
             $element.find('.qor-slideout__lists-item a').removeClass('isShow').show();
             $element.find('.qor-slideout__lists-groupname').show();
             $element.find('.qor-layout__widget-actions, .qor-layout__widget-selector').hide();
