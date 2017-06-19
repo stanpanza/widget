@@ -39,20 +39,13 @@
           }
 
           // Reload parent window when click form submitted
-          $('.qor-theme-slideout').on('slideoutSubmitComplete.qor.slideout' , function() {
+          $('.qor-slideout').on('slideoutSubmitComplete.qor.slideout' , function() {
             setTimeout(function() {
               parent.window.location.reload();
             }, 300);
-          });
-
-        $(document).on('keyup', function(e) {
-          if (e.keyCode === 27) {
+          }).on('slideoutClosed.qor.slideout', function(){
             closeWidgetEditBox();
-          }
-        }).on("click", ".qor-button--cancel, .qor-slideout__close", function() {
-          closeWidgetEditBox();
-        });
-
+          });
 
       });
     </script>
