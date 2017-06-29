@@ -72,9 +72,9 @@
 
     .qor-table img {
         &.qor-preview-icon {
-            width: 120px !important;
             height: auto !important;
-            max-height: 80px;
+            max-height: 100px !important;
+            max-width: 70px !important;
         }
     }
 }
