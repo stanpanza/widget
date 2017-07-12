@@ -8,6 +8,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"
+	"github.com/qor/assetfs"
 	"github.com/qor/qor/resource"
 	"github.com/qor/roles"
 )
@@ -34,7 +35,7 @@ func init() {
 
 // New new widgets container
 func New(config *Config) *Widgets {
-	widgets := &Widgets{Config: config, funcMaps: template.FuncMap{}, AssetFileSystem: &admin.AssetFileSystem{}}
+	widgets := &Widgets{Config: config, funcMaps: template.FuncMap{}, AssetFS: assetfs.AssetFS.NameSpace("widgets")}
 
 	if root != "" {
 		widgets.RegisterViewPath(path.Join(root, "app/views/widgets"))
@@ -48,17 +49,17 @@ type Widgets struct {
 	funcMaps              template.FuncMap
 	Config                *Config
 	Resource              *admin.Resource
-	AssetFileSystem       admin.AssetFSInterface
+	AssetFS               assetfs.Interface
 	WidgetSettingResource *admin.Resource
 }
 
 // SetAssetFS set asset fs for render
-func (widgets *Widgets) SetAssetFS(assetFS admin.AssetFSInterface) {
+func (widgets *Widgets) SetAssetFS(assetFS assetfs.Interface) {
 	for _, viewPath := range viewPaths {
 		assetFS.RegisterPath(viewPath)
 	}
 
-	widgets.AssetFileSystem = assetFS
+	widgets.AssetFS = assetFS
 }
 
 // RegisterWidget register a new widget

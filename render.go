@@ -94,7 +94,7 @@ func (w *Widget) Render(context *Context, file string) template.HTML {
 		}
 	}()
 
-	if content, err = context.Widgets.AssetFileSystem.Asset(file + ".tmpl"); err == nil {
+	if content, err = context.Widgets.AssetFS.Asset(file + ".tmpl"); err == nil {
 		if tmpl, err = template.New(filepath.Base(file)).Funcs(context.FuncMaps).Parse(string(content)); err == nil {
 			var result = bytes.NewBufferString("")
 			if err = tmpl.Execute(result, context.Options); err == nil {
@@ -110,11 +110,11 @@ func (w *Widget) Render(context *Context, file string) template.HTML {
 func (widgets *Widgets) RegisterViewPath(p string) {
 	if filepath.IsAbs(p) {
 		viewPaths = append(viewPaths, p)
-		widgets.AssetFileSystem.RegisterPath(p)
+		widgets.AssetFS.RegisterPath(p)
 	} else {
 		for _, gopath := range strings.Split(os.Getenv("GOPATH"), ":") {
 			viewPaths = append(viewPaths, path.Join(gopath, "src", p))
-			widgets.AssetFileSystem.RegisterPath(path.Join(gopath, "src", p))
+			widgets.AssetFS.RegisterPath(path.Join(gopath, "src", p))
 		}
 	}
 }
