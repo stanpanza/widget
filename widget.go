@@ -35,7 +35,7 @@ func init() {
 
 // New new widgets container
 func New(config *Config) *Widgets {
-	widgets := &Widgets{Config: config, funcMaps: template.FuncMap{}, AssetFS: assetfs.AssetFS.NameSpace("widgets")}
+	widgets := &Widgets{Config: config, funcMaps: template.FuncMap{}, AssetFS: assetfs.AssetFS().NameSpace("widgets")}
 
 	if root != "" {
 		widgets.RegisterViewPath(path.Join(root, "app/views/widgets"))
