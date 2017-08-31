@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/qor/admin"
-	"github.com/qor/roles"
 )
 
 type GroupedWidgets struct {
@@ -25,7 +24,11 @@ var funcMap = map[string]interface{}{
 
 	OUTER:
 		for _, w := range registeredWidgets {
-			if w.Permission == nil || w.Permission.HasPermission(roles.Create, context.Context.Roles...) {
+			var roles = []interface{}{}
+			for _, role := range context.Roles {
+				roles = append(roles, role)
+			}
+			if w.Permission == nil || w.Permission.HasPermission(roles.Create, roles...) {
 				for _, groupedWidgets := range groupedWidgetsSlice {
 					if groupedWidgets.Group == w.Group {
 						groupedWidgets.Widgets = append(groupedWidgets.Widgets, w)
