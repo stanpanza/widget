@@ -23,11 +23,13 @@
                 <h5 class="qor-slideout__lists-groupname">{{t (printf "qor_widgets.group.%v" $groupWidget.Group) $groupWidget.Group}}</h5>
               {{else if (gt (len $groupWidgets) 1)}}
                 <h5 class="qor-slideout__lists-groupname">{{t "qor_widgets.group.other" "Other"}}</h5>
+              {{else}}
+                <h5 class="qor-slideout__lists-title">{{t "qor_widgets.group.title" "Widget Lists"}}</h5>
               {{end}}
 
               <div class="qor-slideout__lists-item">
                 {{range $widget := $groupWidget.Widgets}}
-                  <a href="{{patch_url (join_url (url_for $resource) "!setting") "widget_type" $widget.Name}}" data-widget-type="{{$widget.Name}}" class="qor-widget__new">
+                  <a href="{{patch_url (join_url (url_for $resource) "!setting") "widget_type" $widget.Name}}" data-widget-type="{{$widget.Name}}" data-widget-name="{{$widget.Name}}" class="qor-widget__new">
                     {{if $widget.PreviewIcon}}
                       <img src="{{$widget.PreviewIcon}}">
                     {{end}}
@@ -40,6 +42,7 @@
         </ul>
 
         <div class="qor-layout__widget-selector" style="display: none;">
+          <h5 class="qor-layout__widget-name">{{t "qor_widgets.create_widget_based_on" "Create new container based on"}} <span></span></h5>
           {{render_form $result new_sections}}
         </div>
         <div class="qor-layout__widget-setting"></div>

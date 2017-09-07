@@ -166,6 +166,7 @@
             $target.closest('li').find('.qor-slideout__lists-groupname').show();
 
             $.get(url, function(html) {
+                $title.find('.qor-layout__widget-name span').html($target.data('widget-name'));
                 $title.show();
                 $selector.val(widgetType).closest('.qor-form-section').hide();
                 $setting.html(html).trigger('enable');

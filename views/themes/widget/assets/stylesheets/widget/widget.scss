@@ -2,6 +2,10 @@
     margin: 24px 0;
     padding: 0;
 
+    .qor-slideout__lists-groupname {
+        font-size: 16px;
+    }
+
     li {
         list-style: none;
         padding: 0;
@@ -11,7 +15,7 @@
     .qor-slideout__lists-item {
         img {
             max-width: 100%;
-            box-shadow: 1px 0px 6px rgba(0,0,0,.2);
+            box-shadow: 1px 0px 6px rgba(0, 0, 0, .2);
             margin: 0 auto;
             display: block;
             margin-bottom: 8px;
@@ -41,8 +45,16 @@
 
 .qor-layout__widget-new {
     .qor-layout__widget-selector {
-        &+[data-section-title="Settings"] {
+        margin-top: -20px;
+        & + [data-section-title="Settings"] {
             display: none;
+        }
+        .qor-layout__widget-name {
+            font-weight: 400;
+            font-size: 16px;
+            span {
+                font-weight: 500;
+            }
         }
     }
 }
