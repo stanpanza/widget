@@ -317,7 +317,7 @@ func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourc
 
 		res.Meta(&admin.Meta{
 			Name:  "Shared",
-			Label: "Make this widget and its contents available for reuse",
+			Label: "Add to Container Library (can be reused on other pages)",
 		})
 
 		res.Action(&admin.Action{
