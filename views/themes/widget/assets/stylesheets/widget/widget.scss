@@ -50,16 +50,20 @@
             display: none;
         }
         .qor-layout__widget-name {
-            font-weight: 400;
-            font-size: 16px;
-            span {
-                font-weight: 500;
-            }
+            padding-top: 16px;
+            font-size: 20px;
+            font-weight: 600;
         }
     }
 }
 
 .qor-bottomsheets__body {
+    .qor-layout__widget-selector {
+        .qor-layout__widget-name {
+            padding-top: 0;
+            margin: 0;
+        }
+    }
     .qor-layout__widget-new {
         padding: 0 24px 0 41px;
     }

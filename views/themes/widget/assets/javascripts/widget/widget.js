@@ -149,24 +149,18 @@
                 $sectionSetting = $element.find('[data-section-title="Settings"]'),
                 $loading = $(QorWidget.TEMPLATE_LOADING);
 
-            if ($target.hasClass('isShow')) {
-                return false;
-            }
-
             if ($sectionSetting.length) {
                 $setting = $sectionSetting;
             }
 
             $loading.appendTo($setting).trigger('enable');
 
-            $target.addClass('isShow');
-            $element.find('.qor-slideout__lists-item a').not($target).hide();
+            $element.find('.qor-slideout__lists-item a').hide();
             $element.find('.qor-slideout__lists-groupname').hide();
             $element.find('.qor-layout__widget-actions').show();
-            $target.closest('li').find('.qor-slideout__lists-groupname').show();
 
             $.get(url, function(html) {
-                $title.find('.qor-layout__widget-name span').html($target.data('widget-name'));
+                $title.find('.qor-layout__widget-name').html($target.data('widget-name'));
                 $title.show();
                 $selector.val(widgetType).closest('.qor-form-section').hide();
                 $setting.html(html).trigger('enable');
@@ -183,7 +177,7 @@
             if ($element.closest('.qor-bottomsheets').length) {
                 $element.closest('.qor-bottomsheets').removeClass('qor-bottomsheets__fullscreen');
             }
-            $element.find('.qor-slideout__lists-item a').removeClass('isShow').show();
+            $element.find('.qor-slideout__lists-item a').show();
             $element.find('.qor-slideout__lists-groupname').show();
             $element.find('.qor-layout__widget-actions, .qor-layout__widget-selector').hide();
             $element.find(CLASS_FORM_SETTING).html('');
