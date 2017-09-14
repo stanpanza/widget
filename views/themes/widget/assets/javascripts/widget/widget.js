@@ -23,6 +23,8 @@
         SELECT_FILTER = '[name="QorResource.Widgets"],[name="QorResource.Template"]',
         CLASS_IS_NEW = 'qor-layout__widget-new',
         CLASS_FORM_SECTION = '.qor-form-section',
+        CLASS_LABEL = '.qor-field__label',
+        CLASS_LABEL_VISIBLE = '.qor-field__label:visible',
         CLASS_FORM_SETTING = '.qor-layout__widget-setting';
 
     function QorWidget(element, options) {
@@ -49,32 +51,51 @@
         },
 
         unbind: function() {
-            this.$element
-                .off(EVENT_CHANGE, 'select', this.change.bind(this))
-                .off(EVENT_CLICK, '.qor-widget__new', this.getFormHtml.bind(this));
+            this.$element.off(EVENT_CHANGE, 'select', this.change.bind(this)).off(EVENT_CLICK, '.qor-widget__new', this.getFormHtml.bind(this));
         },
 
         initSelect: function() {
-            var $element = this.$element,
+            let $element = this.$element,
                 $select = $element.find('select').filter(SELECT_FILTER),
                 $kind = $(TARGET_WIDGET_KIND),
-                HINT_TEMPLATE = '<h2 class="qor-page__tips">' + $element.data('hint') + '</h2>';
+                hint = $element.data('hint'),
+                NO_SETTINGS = `<h2 class="qor-page__tips">${hint}</h2>`;
 
             $select.closest(CLASS_FORM_SECTION).hide();
             $select.each(function() {
-                if ($(this).find('option').filter('[value!=""]').length >= 2) {
-                    $(this).closest(CLASS_FORM_SECTION).show();
+                if (
+                    $(this)
+                        .find('option')
+                        .filter('[value!=""]').length >= 2
+                ) {
+                    $(this)
+                        .closest(CLASS_FORM_SECTION)
+                        .show();
                 }
             });
 
-            if (!this.isNewForm) {
-                if (!$kind.parent().next('.qor-form-section-rows').children().length) {
-                    $kind.parent().next('.qor-form-section-rows').append(HINT_TEMPLATE);
+            if (!this.isNewForm && !$element.find('.qor-bannereditor').length) {
+                let $kindNext = $kind.parent().next('.qor-form-section-rows'),
+                    $kindParent = $kind.closest('.qor-fieldset'),
+                    $kindSection = $kind.closest('.qor-form-section');
+
+                // if settings dont have any field. will show NO SETTING HINT in settings container
+                if (!$kindNext.children().length || !$kindParent.find(CLASS_LABEL_VISIBLE).length) {
+                    $kindNext.append(NO_SETTINGS);
+
+                    // if no other fields, just has empty settings fields, hide all elements and show NO SETTING HINT.
                     if (
-                        !$element.find('.qor-field__label').not($kind.closest('.qor-form-section').find('.qor-field__label')).is(':visible')
+                        !$element
+                            .find(CLASS_LABEL)
+                            .not($kindSection.find(CLASS_LABEL))
+                            .is(':visible')
                     ) {
-                        $kind.closest('.qor-form-section').hide();
-                        $element.append(HINT_TEMPLATE).parent().find('.qor-form__actions').remove();
+                        $kindSection.hide();
+                        $element
+                            .append(NO_SETTINGS)
+                            .parent()
+                            .find('.qor-form__actions')
+                            .remove();
                     }
                 }
             }
@@ -162,7 +183,10 @@
             $.get(url, function(html) {
                 $title.find('.qor-layout__widget-name').html($target.data('widget-name'));
                 $title.show();
-                $selector.val(widgetType).closest('.qor-form-section').hide();
+                $selector
+                    .val(widgetType)
+                    .closest('.qor-form-section')
+                    .hide();
                 $setting.html(html).trigger('enable');
             }).fail(function() {
                 window.alert('server error, please try again!');
