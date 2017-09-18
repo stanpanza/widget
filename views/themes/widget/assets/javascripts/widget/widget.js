@@ -39,7 +39,9 @@
         init: function() {
             this.bind();
             this.isNewForm = this.$element.hasClass(CLASS_IS_NEW);
-            !this.isNewForm && this.addWidgetSlideout();
+            if (!this.isNewForm && this.$element.find(TARGET_WIDGET).length) {
+                this.addWidgetSlideout();
+            }
             this.initSelect();
         },
 
@@ -102,12 +104,12 @@
         },
 
         addWidgetSlideout: function() {
-            var $select = $(TARGET_WIDGET),
+            var $select = this.$element.find(TARGET_WIDGET),
                 tabScopeActive = $body.data('tabScopeActive'),
                 isInSlideout = $('.qor-slideout').is(':visible'),
                 $form = $select.closest('form'),
                 actionUrl = $form.data('action-url') || $form.prop('action'),
-                separator = actionUrl.indexOf('?') !== -1 ? '&' : '?',
+                separator = actionUrl && actionUrl.indexOf('?') !== -1 ? '&' : '?',
                 url,
                 clickTmpl;
 
