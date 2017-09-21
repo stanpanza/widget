@@ -114,13 +114,14 @@ func (widgets *Widgets) ConfigureQorResourceBeforeInitialize(res resource.Resour
 
 // Widget widget struct
 type Widget struct {
-	Name        string
-	PreviewIcon string
-	Group       string
-	Templates   []string
-	Setting     *admin.Resource
-	Permission  *roles.Permission
-	Context     func(context *Context, setting interface{}) *Context
+	Name          string
+	PreviewIcon   string
+	Group         string
+	Templates     []string
+	Setting       *admin.Resource
+	Permission    *roles.Permission
+	InlineEditURL func(*Context) string
+	Context       func(context *Context, setting interface{}) *Context
 }
 
 // WidgetsGroup widgets Group

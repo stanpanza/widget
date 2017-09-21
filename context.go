@@ -84,11 +84,14 @@ func (context *Context) Render(widgetName string, widgetGroupName string) templa
 		var (
 			widgetObj     = GetWidget(setting.GetSerializableArgumentKind())
 			widgetSetting = widgetObj.Context(clone, setting.GetSerializableArgument(setting))
-			inlineEditURL = adminContext.URLFor(setting, widgetSettingResource)
 		)
 
 		if clone.InlineEdit {
 			prefix := widgets.Resource.GetAdmin().GetRouter().Prefix
+			inlineEditURL := adminContext.URLFor(setting, widgetSettingResource)
+			if widgetObj.InlineEditURL != nil {
+				inlineEditURL = widgetObj.InlineEditURL(context)
+			}
 
 			return template.HTML(fmt.Sprintf(
 				"<script data-prefix=\"%v\" src=\"%v/assets/javascripts/widget_check.js?theme=widget\"></script><div class=\"qor-widget qor-widget-%v\" data-widget-inline-edit-url=\"%v\" data-url=\"%v\">\n%v\n</div>",
