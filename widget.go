@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"os"
-	"path"
+	"path/filepath"
 
 	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"
@@ -38,7 +38,7 @@ func New(config *Config) *Widgets {
 	widgets := &Widgets{Config: config, funcMaps: template.FuncMap{}, AssetFS: assetfs.AssetFS().NameSpace("widgets")}
 
 	if root != "" {
-		widgets.RegisterViewPath(path.Join(root, "app/views/widgets"))
+		widgets.RegisterViewPath(filepath.Join(root, "app/views/widgets"))
 	}
 	widgets.RegisterViewPath("app/views/widgets")
 	return widgets

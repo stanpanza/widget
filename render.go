@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"html/template"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -113,8 +112,8 @@ func (widgets *Widgets) RegisterViewPath(p string) {
 		widgets.AssetFS.RegisterPath(p)
 	} else {
 		for _, gopath := range strings.Split(os.Getenv("GOPATH"), ":") {
-			viewPaths = append(viewPaths, path.Join(gopath, "src", p))
-			widgets.AssetFS.RegisterPath(path.Join(gopath, "src", p))
+			viewPaths = append(viewPaths, filepath.Join(gopath, "src", p))
+			widgets.AssetFS.RegisterPath(filepath.Join(gopath, "src", p))
 		}
 	}
 }
