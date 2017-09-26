@@ -38,6 +38,9 @@
             }, 350);
           }
 
+          $(document).on('bottomsheetSubmitComplete.qor.bottomsheets', function(){
+            closeWidgetEditBox();
+          })
           // Reload parent window when click form submitted
           $('.qor-slideout').on('slideoutSubmitComplete.qor.slideout' , function() {
             setTimeout(function() {
