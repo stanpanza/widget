@@ -328,14 +328,17 @@ func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourc
 			Modes: []string{"edit", "menu_item"},
 		})
 
-		res.AddProcessor(func(value interface{}, metaValues *resource.MetaValues, context *qor.Context) error {
-			if widgetSetting, ok := value.(QorWidgetSettingInterface); ok {
-				if widgetSetting.GetShared() {
-					widgetSetting.SetSourceType("")
-					widgetSetting.SetSourceID("")
+		res.AddProcessor(&resource.Processor{
+			Name: "widget-default-value",
+			Handler: func(value interface{}, metaValues *resource.MetaValues, context *qor.Context) error {
+				if widgetSetting, ok := value.(QorWidgetSettingInterface); ok {
+					if widgetSetting.GetShared() {
+						widgetSetting.SetSourceType("")
+						widgetSetting.SetSourceID("")
+					}
 				}
-			}
-			return nil
+				return nil
+			},
 		})
 
 		res.UseTheme("widget")
