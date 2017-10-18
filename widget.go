@@ -3,18 +3,17 @@ package widget
 import (
 	"fmt"
 	"html/template"
-	"os"
 	"path/filepath"
 
 	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"
 	"github.com/qor/assetfs"
 	"github.com/qor/qor/resource"
+	"github.com/qor/qor/utils"
 	"github.com/qor/roles"
 )
 
 var (
-	root, _                = os.Getwd()
 	viewPaths              []string
 	registeredWidgets      []*Widget
 	registeredWidgetsGroup []*WidgetsGroup
@@ -27,18 +26,12 @@ type Config struct {
 	PreviewAssets []string
 }
 
-func init() {
-	if path := os.Getenv("WEB_ROOT"); path != "" {
-		root = path
-	}
-}
-
 // New new widgets container
 func New(config *Config) *Widgets {
 	widgets := &Widgets{Config: config, funcMaps: template.FuncMap{}, AssetFS: assetfs.AssetFS().NameSpace("widgets")}
 
-	if root != "" {
-		widgets.RegisterViewPath(filepath.Join(root, "app/views/widgets"))
+	if utils.AppRoot != "" {
+		widgets.RegisterViewPath(filepath.Join(utils.AppRoot, "app/views/widgets"))
 	}
 	widgets.RegisterViewPath("app/views/widgets")
 	return widgets
