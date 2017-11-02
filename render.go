@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
-	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/qor/qor/utils"
 )
@@ -111,7 +109,7 @@ func (widgets *Widgets) RegisterViewPath(p string) {
 		viewPaths = append(viewPaths, p)
 		widgets.AssetFS.RegisterPath(p)
 	} else {
-		for _, gopath := range strings.Split(os.Getenv("GOPATH"), ":") {
+		for _, gopath := range utils.GOPATH() {
 			viewPaths = append(viewPaths, filepath.Join(gopath, "src", p))
 			widgets.AssetFS.RegisterPath(filepath.Join(gopath, "src", p))
 		}
