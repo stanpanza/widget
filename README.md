@@ -25,7 +25,7 @@ Widgets.RegisterWidget(&widget.Widget{
   Setting:  Admin.NewResource(&bannerArgument{}),
   // InlineEditURL overwrite widget's inline edit's setting URL, usually we don't require do that, Widget will generate setting form based on Widget's setting resource, but in case of you want to fully customize your widget's setting page, you can overwrite it to return setting's URL
   InlineEditURL: func(context *Context) string {
-    return "/admin/setting"
+    return "/different-setting-url"
   },
   // Generate a context to render the widget based on the widget's configurations
   Context: func(context *widget.Context, setting interface{}) *widget.Context {
