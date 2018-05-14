@@ -34,10 +34,10 @@ type QorWidgetSettingInterface interface {
 
 // QorWidgetSetting default qor widget setting struct
 type QorWidgetSetting struct {
-	Name        string `gorm:"primary_key"`
+	Name        string `gorm:"primary_key;size:100"`
 	Scope       string `gorm:"primary_key;size:128;default:'default'"`
-	SourceType  string `gorm:"primary_key;default:''"`
-	SourceID    string `gorm:"primary_key;default:''"`
+	SourceType  string `gorm:"primary_key;default:'';size:100"`
+	SourceID    string `gorm:"primary_key;default:'';size:100"`
 	Description string
 	Shared      bool
 	WidgetType  string
