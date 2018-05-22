@@ -140,3 +140,8 @@ func GetWidget(name string) *Widget {
 	}
 	return nil
 }
+
+// GetWidgets GetWidgets return registered widgets
+func GetWidgets() []*Widget {
+	return registeredWidgets
+}
