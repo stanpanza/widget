@@ -138,7 +138,7 @@ func GetWidget(name string) *Widget {
 			}
 		}
 	}
-	return nil
+	panic("widget " + name + " not exists, make sure to register it")
 }
 
 // GetWidgets GetWidgets return registered widgets

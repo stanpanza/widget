@@ -80,8 +80,12 @@ func (w *Widget) Render(context *Context, file string) template.HTML {
 		tmpl    *template.Template
 	)
 
-	if file == "" {
+	if file == "" && len(w.Templates) > 0 {
 		file = w.Templates[0]
+	}
+
+	if len(file) == 0 {
+		return template.HTML(context.Body)
 	}
 
 	defer func() {
