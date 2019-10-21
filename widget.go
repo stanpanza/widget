@@ -3,6 +3,7 @@ package widget
 import (
 	"fmt"
 	"html/template"
+	"log"
 	"path/filepath"
 
 	"github.com/jinzhu/gorm"
@@ -138,6 +139,8 @@ func GetWidget(name string) *Widget {
 			}
 		}
 	}
+
+	log.Println("widget " + name + " not exists, make sure to register it")
 	return nil
 }
 

@@ -74,13 +74,17 @@ func (context *Context) FuncMap() template.FuncMap {
 
 // Render register widget itself content
 func (w *Widget) Render(context *Context, file string) template.HTML {
+	if len(context.Body) > 0 {
+		return template.HTML(context.Body)
+	}
+
 	var (
 		err     error
 		content []byte
 		tmpl    *template.Template
 	)
 
-	if file == "" {
+	if file == "" && len(w.Templates) > 0 {
 		file = w.Templates[0]
 	}
 

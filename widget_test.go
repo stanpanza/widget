@@ -29,10 +29,11 @@ type bannerArgument struct {
 
 func init() {
 	db = utils.TestDB()
+	//db.LogMode(true)
 }
 
 // Runner
-func TestRender(t *testing.T) {
+func setup() {
 	if err := db.DropTableIfExists(&widget.QorWidgetSetting{}).Error; err != nil {
 		panic(err)
 	}
@@ -73,11 +74,21 @@ func TestRender(t *testing.T) {
 			return false
 		},
 	})
+
+	Widgets.RegisterWidget(&widget.Widget{
+		Name:    "NoTemplate",
+		Setting: Admin.NewResource(&bannerArgument{}),
+		Context: func(context *widget.Context, setting interface{}) *widget.Context {
+			context.Body = "<h1>My html</h1>"
+			return context
+		},
+	})
 }
 
 func reset() {
 	db.DropTable(&widget.QorWidgetSetting{})
 	db.AutoMigrate(&widget.QorWidgetSetting{})
+	setup()
 }
 
 // Test DB's record after call Render
@@ -114,7 +125,7 @@ func TestRenderRecord(t *testing.T) {
 func TestRenderContext(t *testing.T) {
 	reset()
 	setting := &widget.QorWidgetSetting{}
-	db.Where(widget.QorWidgetSetting{Name: "HomeBanner", WidgetType: "Banner"}).FirstOrInit(setting)
+	db.Where(widget.QorWidgetSetting{Name: "HomeBanner", WidgetType: "Banner", Scope: "default"}).FirstOrInit(setting)
 	db.Create(setting)
 
 	html := Widgets.Render("HomeBanner", "Banner")
@@ -132,12 +143,26 @@ func TestRenderContext(t *testing.T) {
 
 	db.Where(widget.QorWidgetSetting{Name: "HomeBanner", WidgetType: "Banner"}).FirstOrInit(setting)
 	setting.SetSerializableArgumentValue(&bannerArgument{Title: "Title", SubTitle: "SubTitle"})
-	db.Save(setting)
+	err := db.Model(setting).Update(setting).Error
+	if err != nil {
+		panic(err)
+	}
 
 	html = widgetContext.Render("HomeBanner", "Banner")
 	if !strings.Contains(string(html), "Hello, Qortex\n<h1>Title</h1>\n<h2>SubTitle</h2>\n") {
 		t.Errorf(color.RedString(fmt.Sprintf("\nWidget Render TestCase #%d: Failure Result:\n %s\n", 3, html)))
 	}
+
+}
+
+func TestRenderNoTemplate(t *testing.T) {
+	reset()
+
+	html := Widgets.Render("abc", "NoTemplate")
+	if !strings.Contains(string(html), "<h1>My html</h1>") {
+		t.Errorf(color.RedString(fmt.Sprintf("\nWidget Render TestCase #%d: Failure Result:\n %s\n", 5, html)))
+	}
+
 }
 
 func TestRegisterFuncMap(t *testing.T) {

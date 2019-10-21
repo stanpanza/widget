@@ -17,6 +17,7 @@ type Context struct {
 	DB               *gorm.DB
 	AvailableWidgets []string
 	Options          map[string]interface{}
+	Body             string
 	InlineEdit       bool
 	SourceType       string
 	SourceID         string
