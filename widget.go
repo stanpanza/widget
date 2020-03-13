@@ -75,7 +75,7 @@ func (widgets *Widgets) RegisterFuncMap(name string, fc interface{}) {
 func (widgets *Widgets) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 	if res, ok := res.(*admin.Resource); ok {
 		// register view paths
-		res.GetAdmin().RegisterViewPath("github.com/qor/widget/views")
+		res.GetAdmin().RegisterViewPath("github.com/stanpanza/widget/views")
 
 		// set resources
 		widgets.Resource = res

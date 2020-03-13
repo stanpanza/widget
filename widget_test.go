@@ -44,7 +44,7 @@ func setup() {
 	Widgets = widget.New(&widget.Config{
 		DB: db,
 	})
-	Widgets.RegisterViewPath("github.com/qor/widget/test")
+	Widgets.RegisterViewPath("github.com/stanpanza/widget/test")
 
 	Admin = admin.New(&qor.Config{DB: db})
 	Admin.AddResource(Widgets)
