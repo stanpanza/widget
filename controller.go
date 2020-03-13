@@ -32,11 +32,25 @@ func (wc widgetController) Index(context *admin.Context) {
 
 func (wc widgetController) New(context *admin.Context) {
 	widgetInter := wc.Widgets.WidgetSettingResource.NewStruct().(QorWidgetSettingInterface)
+	query := context.Request.URL.Query()
+	sourceType := query.Get("widget_source_type")
+	sourceID := query.Get("widget_source_id")
+
+	widgetInter.SetSourceID(sourceID)
+	widgetInter.SetSourceType(sourceType)
+
 	context.Execute("new", widgetInter)
 }
 
 func (wc widgetController) Setting(context *admin.Context) {
 	widgetInter := wc.Widgets.WidgetSettingResource.NewStruct().(QorWidgetSettingInterface)
+	query := context.Request.URL.Query()
+	sourceType := query.Get("widget_source_type")
+	sourceID := query.Get("widget_source_id")
+
+	widgetInter.SetSourceID(sourceID)
+	widgetInter.SetSourceType(sourceType)
+
 	widgetType := context.Request.URL.Query().Get("widget_type")
 	if widgetType != "" {
 		if serializableMeta, ok := widgetInter.(serializable_meta.SerializableMetaInterface); ok && serializableMeta.GetSerializableArgumentKind() != widgetType {
@@ -137,12 +151,15 @@ func (wc widgetController) getWidget(context *admin.Context) (interface{}, []str
 		return results, []string{}, err
 	}
 
+	query := context.Request.URL.Query()
 	// show page
 	var (
 		scopes     []string
 		result     = wc.Widgets.WidgetSettingResource.NewStruct()
-		scope      = context.Request.URL.Query().Get("widget_scope")
-		widgetType = context.Request.URL.Query().Get("widget_type")
+		scope      = query.Get("widget_scope")
+		widgetType = query.Get("widget_type")
+		sourceType = query.Get("primary_key[qor_widget_settings_source_type]")
+		sourceID   = query.Get("primary_key[qor_widget_settings_source_id]")
 	)
 
 	if scope == "" {
@@ -156,7 +173,12 @@ func (wc widgetController) getWidget(context *admin.Context) (interface{}, []str
 		widgetType = context.Request.Form.Get("QorResource.Kind")
 	}
 
-	err := DB.FirstOrInit(result, QorWidgetSetting{Name: context.ResourceID, Scope: scope}).Error
+	err := DB.FirstOrInit(result, QorWidgetSetting{
+		Name:       context.ResourceID,
+		Scope:      scope,
+		SourceType: sourceType,
+		SourceID:   sourceID,
+	}).Error
 
 	if widgetType != "" {
 		if serializableMeta, ok := result.(serializable_meta.SerializableMetaInterface); ok && serializableMeta.GetSerializableArgumentKind() != widgetType {
