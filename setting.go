@@ -39,6 +39,7 @@ type QorWidgetSetting struct {
 	SourceType  string `gorm:"primary_key;default:'';size:100"`
 	SourceID    string `gorm:"primary_key;default:'';size:100"`
 	Description string
+	SlotName    string
 	Shared      bool
 	WidgetType  string
 	GroupName   string
@@ -173,6 +174,7 @@ func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourc
 		res.Meta(&admin.Meta{Name: "Name", Type: "string"})
 		res.Meta(&admin.Meta{Name: "DisplayName", Label: "Name", Type: "readonly", FieldName: "Name"})
 		res.Meta(&admin.Meta{Name: "Description", Type: "string"})
+		res.Meta(&admin.Meta{Name: "SlotName", Type: "string"})
 
 		res.Meta(&admin.Meta{
 			Name: "Scope",
@@ -348,7 +350,7 @@ func (widgetSetting *QorWidgetSetting) ConfigureQorResource(res resource.Resourc
 			res.ShowAttrs("PreviewIcon", "Name", "Scope", "WidgetType", "Template", "Description", "Value", "CreatedAt", "UpdatedAt")
 		})
 		res.EditAttrs(
-			"DisplayName", "Description", "Scope", "Widgets", "Template",
+			"DisplayName", "Description", "SlotName", "Scope", "Widgets", "Template",
 			&admin.Section{
 				Title: "Settings",
 				Rows:  [][]string{{"Kind"}, {"SerializableMeta"}},
